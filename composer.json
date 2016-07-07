@@ -9,7 +9,6 @@
             "email": "hi@milsdev.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "composer/installers": "~1.0",
         "php-di/php-di": "5.2.2",
