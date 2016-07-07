@@ -1,0 +1,10 @@
+.buildpath
+.project
+.settings
+.idea/*
+*~
+.DS_Store
+npm-debug.json
+vendor/
+composer.lock
+composer.phar
