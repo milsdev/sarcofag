@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+<?php
+if (!empty($_SERVER['argc']) && $_SERVER['argc'] > 1 && $_SERVER['argv'][1] === 'install') {
+    if (is_link(__DIR__ . "/../../index.php")) {
+        echo "Sarcofag already installed.";
+    } else {
+        echo "Installing sarcofag ....";
+        symlink(__DIR__ . "/../index.php", __DIR__ . "/../../index.php");
+    }
+}

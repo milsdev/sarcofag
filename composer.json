@@ -1,6 +1,6 @@
 {
-    "name": "milsdev/sarcofag",
-    "description": "Wordpress MU plugin which add to wp support for DI and MVC",
+    "name": "milsdev/wordpress-plugin-sarcofag",
+    "description": "Wordpress plugin which add to wp support for DI and MVC",
     "type": "wordpress-muplugin",
     "license": "GPL",
     "authors": [
@@ -15,5 +15,11 @@
         "slim/slim": "3.1",
         "slim/php-view": "2.0.6",
         "mobiledetect/mobiledetectlib": "2.8"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "bin": ["bin/install"],
+    "extra": {
+        "installer-name": "sarcofag"
     }
 }
