@@ -81,20 +81,35 @@ class Sarcofag
     {
         $containerBuilder->addDefinitions(__DIR__ . '/config/di.inc.php');
 
+        $containerBuilder->addDefinitions([
+            'DefaultStaticPostController' => 'Sarcofag\Defaults\Controller\StaticPostController',
+            'DefaultStaticPageController' => 'Sarcofag\Defaults\Controller\StaticPostController'
+        ]);
+        
         if (file_exists(get_template_directory() . '/src/config/di.inc.php')) {
             $containerBuilder->addDefinitions(require get_template_directory() . '/src/config/di.inc.php');
         }
-
+        
         $containerBuilder->addDefinitions([Slim\App::class => function () { return $this->app; }]);
 
         $this->di = $containerBuilder->build();
         $this->app = new Slim\App($this->di);
 
         add_action( 'template_include', function () {
+            
             foreach (get_pages() as $page) {
                 $controller = $this->controllerPageMapping->getValue($page->ID);
                 $this->app->get(parse_url(get_permalink($page), PHP_URL_PATH),
-                    $this->di->get(empty($controller) ? 'Api\Controller\StaticController' : $controller));
+                                $this->di->get(empty($controller) ? 'DefaultStaticPageController' : $controller))
+                     ->setArgument('requestedEntity', $page);
+            }
+
+            foreach (get_posts() as $post) {
+                $controller = $this->controllerPageMapping->getValue($post->ID);
+                $this->app
+                     ->get(parse_url(get_permalink($post), PHP_URL_PATH),
+                           $this->di->get(empty($controller) ? 'DefaultStaticPostController' : $controller))
+                     ->setArgument('requestedEntity', $post);
             }
             $this->app->run();
         }, 99);
@@ -102,8 +117,12 @@ class Sarcofag
 }
 
 add_action( 'init', function () {
-    $loader = include get_template_directory() . '/vendor/autoload.php';
+    $loader = include ABSPATH . '/vendor/autoload.php';
     $loader->setPsr4('Sarcofag\\', [ __DIR__ ]);
+
+    if (is_dir(get_template_directory() . '/src/api')) {
+        $loader->setPsr4('Api\\', [get_template_directory() . '/src/api']);
+    }
 
     return new Sarcofag(new DI\ContainerBuilder());
 });

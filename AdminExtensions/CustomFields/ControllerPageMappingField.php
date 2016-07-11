@@ -26,14 +26,6 @@ require_once __DIR__ . "/CustomFieldAbstract.php";
 class ControllerPageMappingField extends CustomFieldAbstract
 {
     /**
-     * Admin section context to
-     * render this field
-     *
-     * @var string
-     */
-    protected $context = 'page';
-
-    /**
      * Field name in html and identifier
      * in HTML tag of this field.
      *
@@ -56,6 +48,10 @@ class ControllerPageMappingField extends CustomFieldAbstract
     {
         add_filter('manage_page_posts_columns', function ($defaults) { return $this->showColumnsHead($defaults);}, 10);
         add_action('manage_page_posts_custom_column', function ($column_name, $post_ID) {
+            return $this->showColumnsContent($column_name, $post_ID);
+        }, 10, 2);
+        add_filter('manage_post_posts_columns', function ($defaults) { return $this->showColumnsHead($defaults);}, 10);
+        add_action('manage_post_posts_custom_column', function ($column_name, $post_ID) {
             return $this->showColumnsContent($column_name, $post_ID);
         }, 10, 2);
         add_action( 'admin_menu', function () { return $this->createSelectBox();});
@@ -118,7 +114,8 @@ class ControllerPageMappingField extends CustomFieldAbstract
             include __DIR__ . '/templates/ControllerPageMappingFieldBox.phtml';
         }, $this);
 
-        add_meta_box( $this->fieldName.'-select', $this->name, $render, $this->context, 'normal', 'high' );
+        add_meta_box( $this->fieldName.'-select', $this->name, $render, 'page', 'normal', 'high' );
+        add_meta_box( $this->fieldName.'-select', $this->name, $render, 'post', 'normal', 'high' );
     }
 
     /**
@@ -133,7 +130,8 @@ class ControllerPageMappingField extends CustomFieldAbstract
     protected function saveSelectBoxValue($postId, \WP_Post $post)
     {
 
-        if ( !wp_verify_nonce( $_POST[$this->fieldName.'-nonce'], plugin_basename( __FILE__ ) ) )
+        if ( empty($_POST[$this->fieldName.'-nonce']) ||
+                !wp_verify_nonce( $_POST[$this->fieldName.'-nonce'], plugin_basename( __FILE__ ) ) )
             return $postId;
 
         if ( !current_user_can( 'edit_post', $postId ) )

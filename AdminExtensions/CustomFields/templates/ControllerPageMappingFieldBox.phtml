@@ -22,6 +22,12 @@
     <select name="<?=$this->fieldName?>" id="<?=$this->fieldName?>" style="width: 97%;">
         <?php
         $selected = get_post_meta( $object->ID, $this->name, true );
+        if (empty($selected)) {
+            echo '<option value="" selected="true">Default Static Controller</option>';
+        } else {
+            echo '<option value="">Default Static Controller</option>';
+        }
+
         foreach ($this->readAllControllersFromFS() as $controller) {
             if ($selected === $controller) {
                 echo '<option value="'.$controller.'" selected="true">'.$controller.'</option>';
