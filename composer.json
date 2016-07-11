@@ -18,7 +18,7 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["bin/install"],
+    "bin": ["bin/sarcofag"],
     "extra": {
         "installer-name": "sarcofag"
     }
