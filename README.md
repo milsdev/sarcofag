@@ -5,5 +5,5 @@ and to further usage in custom themes.
 ##Installation
 `curl -s http://getcomposer.org/installer | php`<br/>
 `php composer.phar self-update`<br/>
-`php composer.phar install && php composer.phar update`
-`./vendor/bin/sarcofag install`
+`php composer.phar install && php composer.phar update`<br/>
+`./vendor/bin/sarcofag install`<br/>
