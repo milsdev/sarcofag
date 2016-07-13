@@ -2,4 +2,9 @@
 Wordpress plugin which add to the wordpress Slim Framework
 
 ##Installation
-Need to copy file mustuse-loader.php to the wp-content/mu-plugins/ to enable sarcofag.
+`curl -s http://getcomposer.org/installer | php`<br/>
+`php composer.phar self-update`<br/>
+`php composer.phar install && php composer.phar update`
+`./vendor/bin/sarcofag install`
+
+
