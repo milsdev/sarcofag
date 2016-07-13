@@ -17,18 +17,18 @@
 */
 ?>
 <p>
-    <label for="<?=$this->fieldName?>"><?=$this->name?></label>
+    <label for="<?=$fieldName?>"><?=$name?></label>
     <br />
-    <select name="<?=$this->fieldName?>" id="<?=$this->fieldName?>" style="width: 97%;">
+    <select name="<?=$fieldName?>" id="<?=$fieldName?>" style="width: 97%;">
         <?php
-        $selected = get_post_meta( $object->ID, $this->name, true );
+        $selected = get_post_meta( $object->ID, $name, true );
         if (empty($selected)) {
             echo '<option value="" selected="true">Default Static Controller</option>';
         } else {
             echo '<option value="">Default Static Controller</option>';
         }
-
-        foreach ($this->readAllControllersFromFS() as $controller) {
+        
+        foreach ($readAllControllersFromFS() as $controller) {
             if ($selected === $controller) {
                 echo '<option value="'.$controller.'" selected="true">'.$controller.'</option>';
             } else {
@@ -37,7 +37,7 @@
         }
         ?>
     </select>
-    <input type="hidden" name="<?=$this->fieldName?>-nonce"
+    <input type="hidden" name="<?=$fieldName?>-nonce"
            value="<?php echo wp_create_nonce( plugin_basename( $file ) ); ?>" />
 
 </p>

@@ -33,11 +33,14 @@ return [
         return $pdo;
     },
 
-    Api\Lib\SimpleViewRenderer::class => function (ContainerInterface $container) {
-        $helper = $container->get(Api\ViewHelper\ViewHelperManager::class);
-        $renderer = new \Api\Lib\SimpleViewRenderer($helper, __DIR__ . '/../../api/view/script');
-        $layoutHelper = new \Api\ViewHelper\LayoutHelper($renderer);
-
+    Sarcofag\View\Renderer\SimpleRenderer::class => function (ContainerInterface $container) {
+        $helper = $container->get(\Sarcofag\View\Helper\HelperManager::class);
+        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($helper,
+                                                               ['admin' => __DIR__ . '/../../src/admin/view',
+                                                                'theme' => __DIR__ . '/../../src/theme/view'],
+                                                               $container->get('Sarcofag\Service\API\WP'));
+        
+        $layoutHelper = new \Sarcofag\View\Helper\LayoutHelper($renderer);
         $helper->addViewHelper('layout', $layoutHelper);
         return $renderer;
     },

@@ -27,8 +27,8 @@ Author URI: http://milsdev.com/
 namespace Sarcofag;
 
 use DI;
+use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
 use Slim;
-use Sarcofag\AdminExtensions\CustomFields\ControllerPageMappingField;
 
 class Sarcofag
 {
@@ -69,8 +69,7 @@ class Sarcofag
 
     protected function initFields()
     {
-
-        $this->controllerPageMapping = new ControllerPageMappingField();
+        $this->controllerPageMapping = $this->di->get('Sarcofag\Admin\CustomFields\ControllerPageMappingField');
         $this->controllerPageMapping->register();
     }
 
@@ -82,8 +81,8 @@ class Sarcofag
         $containerBuilder->addDefinitions(__DIR__ . '/config/di.inc.php');
 
         $containerBuilder->addDefinitions([
-            'DefaultStaticPostController' => 'Sarcofag\Defaults\Controller\StaticPostController',
-            'DefaultStaticPageController' => 'Sarcofag\Defaults\Controller\StaticPostController'
+            'DefaultStaticPostController' => 'Sarcofag\Theme\Controller\StaticPostController',
+            'DefaultStaticPageController' => 'Sarcofag\Theme\Controller\StaticPostController'
         ]);
         
         if (file_exists(get_template_directory() . '/src/config/di.inc.php')) {
@@ -118,7 +117,7 @@ class Sarcofag
 
 add_action( 'init', function () {
     $loader = include ABSPATH . '/vendor/autoload.php';
-    $loader->setPsr4('Sarcofag\\', [ __DIR__ ]);
+    $loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
 
     if (is_dir(get_template_directory() . '/src/api')) {
         $loader->setPsr4('Api\\', [get_template_directory() . '/src/api']);

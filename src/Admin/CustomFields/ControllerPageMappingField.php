@@ -15,9 +15,8 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-namespace Sarcofag\AdminExtensions\CustomFields;
-
-require_once __DIR__ . "/CustomFieldAbstract.php";
+namespace Sarcofag\Admin\CustomFields;
+use Sarcofag\View\Renderer\RendererInterface;
 
 /**
  * Class ControllerPageMappingField
@@ -40,6 +39,19 @@ class ControllerPageMappingField extends CustomFieldAbstract
      * @var string
      */
     protected $name = 'Mapped Controller';
+
+    /**
+     * @var RendererInterface
+     */
+    protected $viewRenderer = null;
+
+    /**
+     * ControllerPageMappingField constructor.
+     */
+    public function __construct(RendererInterface $viewRenderer)
+    {
+        $this->viewRenderer = $viewRenderer;
+    }
 
     /**
      * ControllerPageMappingField constructor.
@@ -111,7 +123,16 @@ class ControllerPageMappingField extends CustomFieldAbstract
         $file = __FILE__;
 
         $render = \Closure::bind(function ($object, $box) use ($file) {
-            include __DIR__ . '/templates/ControllerPageMappingFieldBox.phtml';
+            echo $this->viewRenderer->render('admin/script/custom-fields/controller-page-mapping-field-box.phtml',
+                                             ['object'=>$object,
+                                              'box'=>$box,
+                                              'file'=>$file,
+                                              'name'=>$this->name,
+                                              'readAllControllersFromFS' =>
+                                                  \Closure::bind(function () {
+                                                      return $this->readAllControllersFromFS();
+                                                  }, $this),
+                                              'fieldName'=>$this->fieldName]);
         }, $this);
 
         add_meta_box( $this->fieldName.'-select', $this->name, $render, 'page', 'normal', 'high' );
@@ -129,7 +150,7 @@ class ControllerPageMappingField extends CustomFieldAbstract
      */
     protected function saveSelectBoxValue($postId, \WP_Post $post)
     {
-
+        
         if ( empty($_POST[$this->fieldName.'-nonce']) ||
                 !wp_verify_nonce( $_POST[$this->fieldName.'-nonce'], plugin_basename( __FILE__ ) ) )
             return $postId;
@@ -137,17 +158,22 @@ class ControllerPageMappingField extends CustomFieldAbstract
         if ( !current_user_can( 'edit_post', $postId ) )
             return $postId;
 
-        $metaValue = get_post_meta( $postId, $this->name, true );
+
+        if (!metadata_exists('post', $postId, $this->name)) {
+            $metaValue = false;
+        } else {
+            $metaValue = get_post_meta($postId, $this->name, true);
+        }
+
         $newMetaValue = $_POST[$this->fieldName];
-
-        if ( $newMetaValue && '' == $metaValue )
-            add_post_meta( $postId, $this->name, $newMetaValue, true );
-
-        elseif ( $newMetaValue != $metaValue )
-            update_post_meta( $postId, $this->name, $newMetaValue );
-
-        elseif ( '' == $newMetaValue && $metaValue )
-            delete_post_meta( $postId, $this->name, $metaValue );
+        
+        if ($newMetaValue && false === $metaValue ) {
+            add_post_meta($postId, $this->name, $newMetaValue, true);
+        } elseif ( $newMetaValue != $metaValue ) {
+            update_post_meta($postId, $this->name, $newMetaValue);
+        } elseif ( '' == $newMetaValue && $metaValue ) {
+            delete_post_meta($postId, $this->name, $metaValue);
+        }
     }
 
     /**
