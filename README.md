@@ -7,5 +7,3 @@ and to further usage in custom themes.
 `php composer.phar self-update`<br/>
 `php composer.phar install && php composer.phar update`
 `./vendor/bin/sarcofag install`
-
-
