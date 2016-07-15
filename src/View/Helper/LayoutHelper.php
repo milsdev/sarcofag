@@ -2,24 +2,24 @@
 namespace Sarcofag\View\Helper;
 
 use Sarcofag\Exception\RuntimeException;
-use Sarcofag\View\Renderer\SimpleRenderer;
+use Sarcofag\View\Renderer\RendererInterface;
 use Slim\Http\Response;
 
 class LayoutHelper implements HelperInterface
 {
     /**
-     * @var SimpleRenderer
+     * @var RendererInterface
      */
     protected $renderer;
 
     /**
      * LayoutHelper constructor.
      *
-     * @param SimpleRenderer $simpleViewRenderer
+     * @param RendererInterface $simpleViewRenderer
      */
-    public function __construct(SimpleRenderer $simpleViewRenderer)
+    public function __construct(RendererInterface $renderer)
     {
-        $this->renderer = $simpleViewRenderer;
+        $this->renderer = $renderer;
     }
 
     /**

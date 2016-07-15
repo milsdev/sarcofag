@@ -12,6 +12,9 @@ namespace Sarcofag;
 
 use DI;
 use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
+use Sarcofag\Service\SPI\RegisterActionInterface;
+use Sarcofag\Service\SPI\RegisterFilterInterface;
+use Sarcofag\Service\SPI\Widget;
 use Slim;
 
 class Sarcofag
@@ -42,6 +45,24 @@ class Sarcofag
 
         $this->initLang();
         $this->initFields();
+
+        $this->di->get(RegisterActionInterface::class)->registerActions();
+        $this->di->get(RegisterFilterInterface::class)->registerFilters();
+    }
+
+    protected function observeWPEvents()
+    {
+//        add_action( 'widgets_init', function () {
+//            $this->di->get(Widget\Registry::class);
+//            register_sidebar( array(
+//                'name'          => 'Home right sidebar',
+//                'id'            => 'home_right_1',
+//                'before_widget' => '<div>',
+//                'after_widget'  => '</div>',
+//                'before_title'  => '<h2 class="rounded">',
+//                'after_title'   => '</h2>',
+//            ) );
+//        });
     }
 
     protected function initLang()
@@ -99,13 +120,12 @@ class Sarcofag
     }
 }
 
-add_action( 'init', function () {
-    $loader = include ABSPATH . '/vendor/autoload.php';
-    $loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
+$loader = include ABSPATH . '/vendor/autoload.php';
 
-    if (is_dir(get_template_directory() . '/src/api')) {
-        $loader->setPsr4('Api\\', [get_template_directory() . '/src/api']);
-    }
+$loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
 
-    return new Sarcofag(new DI\ContainerBuilder());
-});
+if (is_dir(get_template_directory() . '/src/api')) {
+    $loader->setPsr4('Api\\', [get_template_directory() . '/src/api']);
+}
+
+new Sarcofag(new DI\ContainerBuilder());

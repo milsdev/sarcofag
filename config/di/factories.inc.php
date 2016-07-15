@@ -18,19 +18,15 @@ return [
     },
 
     Sarcofag\View\Renderer\SimpleRenderer::class => function (ContainerInterface $container) {
-        $helper = $container->get(\Sarcofag\View\Helper\HelperManager::class);
         /* @var $themeEntity WP_Theme */
         $themeEntity = $container->get(\Sarcofag\Service\API\WP::class)->wp_get_theme();
         $themeDirectory = $themeEntity->get_template_directory() . '/src/api/view';
 
-        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($helper,
+        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('Sarcofag\View\Helper\HelperManager'),
                                                                ['admin' => __DIR__ . '/../../src/admin/view',
                                                                 'theme' => __DIR__ . '/../../src/theme/view',
                                                                 $themeEntity->get_template() => $themeDirectory],
-                                                               $container->get('Sarcofag\Service\API\WP'));
-
-        $layoutHelper = new \Sarcofag\View\Helper\LayoutHelper($renderer);
-        $helper->addViewHelper('layout', $layoutHelper);
+                                                                $container->get('Sarcofag\Service\API\WP'));
         return $renderer;
     },
 

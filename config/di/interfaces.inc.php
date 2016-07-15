@@ -5,4 +5,10 @@ return [
 
     \Sarcofag\View\Renderer\PsrHttpRendererInterface::class =>
         DI\get(\Sarcofag\View\Renderer\SimpleRenderer::class),
+
+    \Sarcofag\Service\SPI\RegisterActionInterface::class =>
+        DI\get('EventsRegistrator'),
+
+    \Sarcofag\Service\SPI\RegisterFilterInterface::class =>
+        DI\get('EventsRegistrator')
 ];
