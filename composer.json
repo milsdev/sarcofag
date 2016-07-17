@@ -2,7 +2,7 @@
     "name": "milsdev/wordpress-plugin-sarcofag",
     "description": "Wordpress plugin, brings EventDispatcher, DependencyInjection and MVC to the Wordpress.",
     "type": "wordpress-muplugin",
-    "license": "GPL",
+    "license": "GPL-2.0",
     "authors": [
         {
             "name": "Mil's",
@@ -12,9 +12,9 @@
     "require": {
         "composer/installers": "~1.0",
         "php-di/php-di": "5.2.2",
-        "slim/slim": "3.1",
-        "slim/php-view": "2.0.6",
-        "mobiledetect/mobiledetectlib": "2.8",
+        "slim/slim": "3.4.*",
+        "slim/php-view": "2.0.*",
+        "mobiledetect/mobiledetectlib": "~2.8",
         "php": "^5.5 || ^7.0"
     },
     "require-dev": {
