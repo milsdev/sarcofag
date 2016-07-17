@@ -2,6 +2,8 @@
 return [
     'router' => DI\object(Slim\Router::class),
     'foundHandler' => DI\object(Slim\Handlers\Strategies\RequestResponse::class),
+    Slim\App::class => DI\object()
+                            ->constructor(DI\get(DI\Container::class)),
     Sarcofag\View\Helper\HelperManager::class =>
                 DI\object()->method('addViewHelper',
                                         'screen', \Sarcofag\View\Helper\ScreenSizeDetectionHelper::class)
