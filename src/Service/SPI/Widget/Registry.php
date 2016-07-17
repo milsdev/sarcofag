@@ -44,12 +44,17 @@ class Registry implements ActionInterface
      */
     public function attach(WidgetInterface $widget, array $widgetOptions = [])
     {
-        
-        $this->attached[] = $this->factory->make('Sarcofag\Service\API\WP\Widget',
-                                                      ['widgetId' => md5($widget->getName()),
-                                                       'widgetName' => $widget->getName(),
-                                                       'widgetOptions' => $widgetOptions,
-                                                       'widget' => $widget]);
+        $wrapped = $this->factory->make('Sarcofag\Service\API\WP\Widget',
+                                        ['widgetId' => md5($widget->getName()),
+                                         'widgetName' => $widget->getName(),
+                                         'widgetOptions' => $widgetOptions,
+                                         'widget' => $widget]);
+
+        if ($widget instanceof GenericWidget) {
+            $this->attached[md5($widget->getName())] = $wrapped;
+        } else {
+            $this->attached[] = $wrapped;
+        }
 
         return $this;
     }
@@ -61,8 +66,12 @@ class Registry implements ActionInterface
     public function getActionListeners()
     {
         $widgetsInit = function () {
-            foreach ($this->attached as $attachedItem) {
-                $this->widgetFactory->register($attachedItem);
+            foreach ($this->attached as $k=>$attachedItem) {
+                if (is_numeric($k)) {
+                    $this->widgetFactory->register($attachedItem);
+                } else {
+                    $this->widgetFactory->register($attachedItem, $k);
+                }
             }
         };
 

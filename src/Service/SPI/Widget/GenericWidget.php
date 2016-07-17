@@ -44,8 +44,8 @@ class GenericWidget implements WidgetInterface, PersistableInterface
     public function __construct($widgetName,
                                 $adminTemplate,
                                 $themeTemplate,
-                                FiltrationInterface $filtrationService = null,
-                                RendererInterface $renderer)
+                                RendererInterface $renderer,
+                                FiltrationInterface $filtrationService = null)
     {
         $this->widgetName = $widgetName;
         $this->adminTemplate = $adminTemplate;
