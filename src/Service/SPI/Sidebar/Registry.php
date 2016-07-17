@@ -43,8 +43,20 @@ class Registry implements ActionInterface
      */
     public function attach(SidebarEntryInterface $sidebarEntry)
     {
-
         $this->attached[] = $sidebarEntry;
+        return $this;
+    }
+
+    /**
+     * @param SidebarEntryAggregateInterface $sidebarEntryAggregate
+     *
+     * @return $this
+     */
+    public function attachBunch(SidebarEntryAggregateInterface $sidebarEntryAggregate)
+    {
+        foreach ($sidebarEntryAggregate->getSidebarEntries() as $sidebarEntry) {
+            $this->attached[] = $sidebarEntry;
+        }
         return $this;
     }
 

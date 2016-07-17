@@ -38,13 +38,13 @@ class GenericWidget implements WidgetInterface, PersistableInterface
      * @param string $widgetName
      * @param string $adminTemplate
      * @param string $themeTemplate
-     * @param FiltrationInterface $filtrationService
+     * @param FiltrationInterface $filtrationService [OPTIONAL]
      * @param RendererInterface $renderer
      */
     public function __construct($widgetName,
                                 $adminTemplate,
                                 $themeTemplate,
-                                FiltrationInterface $filtrationService,
+                                FiltrationInterface $filtrationService = null,
                                 RendererInterface $renderer)
     {
         $this->widgetName = $widgetName;
@@ -59,14 +59,18 @@ class GenericWidget implements WidgetInterface, PersistableInterface
      * to persist for current WP Widget.
      *
      * @param WPWidget $wpWidget
-     * @param array $oldSettings
      * @param array $newSettings
+     * @param array $oldSettings
      *
      * @return array Return filtered settings
      */
-    public function filter(WPWidget $wpWidget, $oldSettings, $newSettings)
+    public function filter(WPWidget $wpWidget, $newSettings, $oldSettings)
     {
-        return $this->filtrationService->filter($oldSettings, $newSettings);
+        if (is_null($this->filtrationService)) {
+            return $newSettings;
+        }
+
+        return $this->filtrationService->filter($wpWidget, $newSettings, $oldSettings);
     }
 
     /**

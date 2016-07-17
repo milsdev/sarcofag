@@ -56,7 +56,7 @@ final class Widget extends \WP_Widget
         if ($this->instance instanceof FiltrationInterface) {
             return $this->instance->filter($this, $newSettings, $oldSettings);
         } else {
-            return $oldSettings;
+            return $newSettings;
         }
     }
 

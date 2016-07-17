@@ -11,6 +11,7 @@ Author URI: http://milsdev.com/
 namespace Sarcofag;
 
 use DI;
+use Sarcofag\Service\API\WP;
 use Slim;
 use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
 use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
@@ -29,16 +30,23 @@ class App implements ActionInterface
     protected $app;
 
     /**
+     * @var WP
+     */
+    protected $wpService;
+
+    /**
      * App constructor.
      *
      * @param DI\FactoryInterface $factory
      * @param Slim\App $slimApp
      */
     public function __construct(DI\FactoryInterface $factory,
-                                    Slim\App $slimApp)
+                                Slim\App $slimApp,
+                                WP $wpService)
     {
         $this->factory = $factory;
         $this->app = $slimApp;
+        $this->wpService = $wpService;
     }
 
     /**
@@ -48,18 +56,18 @@ class App implements ActionInterface
     {
         $routeDispatcher = function () {
             $controllerPageMapping = $this->app->getContainer()->get(ControllerPageMappingField::class);
-            foreach (get_pages() as $page) {
+
+            foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => 'page']) as $page) {
                 $controller = $controllerPageMapping->getValue($page->ID);
-                $this->app->get(parse_url(get_permalink($page), PHP_URL_PATH),
+                $this->app->map(['get', 'post'], parse_url(get_permalink($page), PHP_URL_PATH),
                                 $this->app->getContainer()
                                      ->get(empty($controller) ? 'DefaultStaticPageController' : $controller))
                      ->setArgument('requestedEntity', $page);
             }
 
-            foreach (get_posts() as $post) {
+            foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => 'post']) as $post) {
                 $controller = $controllerPageMapping->getValue($post->ID);
-                $this->app
-                     ->get(parse_url(get_permalink($post), PHP_URL_PATH),
+                $this->app->map(['get', 'post'], parse_url(get_permalink($post), PHP_URL_PATH),
                             $this->app->getContainer()
                                  ->get(empty($controller) ? 'DefaultStaticPostController' : $controller))
                      ->setArgument('requestedEntity', $post);

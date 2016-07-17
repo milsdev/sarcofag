@@ -10,10 +10,10 @@ interface FiltrationInterface
      * to persist for current WP Widget.
      *
      * @param Widget $wpWidget
-     * @param array $oldSettings
      * @param array $newSettings
+     * @param array $oldSettings
      *
      * @return array Return filtered settings
      */
-    public function filter(Widget $wpWidget, $oldSettings, $newSettings);
+    public function filter(Widget $wpWidget, $newSettings, $oldSettings);
 }
