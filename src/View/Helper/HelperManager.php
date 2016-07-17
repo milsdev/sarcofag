@@ -4,7 +4,7 @@ namespace Sarcofag\View\Helper;
 use DI\FactoryInterface;
 use Sarcofag\Exception\RuntimeException;
 
-class HelperManager
+class HelperManager implements HelperManagerInterface
 {
     /**
      * @var HelperInterface[]

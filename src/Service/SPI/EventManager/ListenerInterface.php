@@ -14,6 +14,14 @@ interface ListenerInterface
     public function __invoke($arguments = []);
 
     /**
+     * It is basic event to execute in
+     * wordpress context.
+     *
+     * @return Callable
+     */
+    public function getCallable();
+
+    /**
      * @return string[]
      */
     public function getNames();

@@ -46,7 +46,7 @@ class Registry implements ActionInterface
     {
         
         $this->attached[] = $this->factory->make('Sarcofag\Service\API\WP\Widget',
-                                                      ['widgetId' => spl_object_hash($widget),
+                                                      ['widgetId' => md5($widget->getName()),
                                                        'widgetName' => $widget->getName(),
                                                        'widgetOptions' => $widgetOptions,
                                                        'widget' => $widget]);

@@ -49,6 +49,17 @@ class GenericListener implements ListenerInterface
      * It is basic action to register in
      * wordpress.
      *
+     * @return Callable
+     */
+    public function getCallable()
+    {
+        return $this->callable;
+    }
+
+    /**
+     * It is basic action to register in
+     * wordpress.
+     *
      * @param array $arguments [OPTIONAL]
      *
      * @return void

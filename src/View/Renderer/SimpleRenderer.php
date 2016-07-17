@@ -4,12 +4,12 @@ namespace Sarcofag\View\Renderer;
 use Sarcofag\Service\API\WP;
 use Sarcofag\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
-use Sarcofag\View\Helper\HelperManager;
+use Sarcofag\View\Helper\HelperManagerInterface;
 
 class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
 {
     /**
-     * @var HelperManager
+     * @var HelperManagerInterface
      */
     protected $helperManager;
 
@@ -30,7 +30,7 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
      * @param array $templaterConfig
      * @param WP $wp
      */
-    public function __construct(HelperManager $helperManager,
+    public function __construct(HelperManagerInterface $helperManager,
                                 array $templaterConfig,
                                 WP $wp)
     {
@@ -51,7 +51,6 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
             throw new RuntimeException('Template path ['.$template.'] has incorrect format, '.
                                         'it is must start from theme-name or alias path');
         }
-
         
         $extracted = array_splice($parts, 0, 1);
 
@@ -60,6 +59,7 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
             $alias = $this->wp->wp_get_theme()->template;
             array_unshift($parts, $extracted[0]);
         }
+        
 
         $fullTemplatePath = rtrim($this->templateConfig[$alias], '/') . '/' . join('/', $parts);
         

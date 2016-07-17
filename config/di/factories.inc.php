@@ -22,7 +22,7 @@ return [
         $themeEntity = $container->get(\Sarcofag\Service\API\WP::class)->wp_get_theme();
         $themeDirectory = $themeEntity->get_template_directory() . '/src/api/view';
 
-        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('Sarcofag\View\Helper\HelperManager'),
+        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('HelperManager'),
                                                                ['admin' => __DIR__ . '/../../src/admin/view',
                                                                 'theme' => __DIR__ . '/../../src/theme/view',
                                                                 $themeEntity->get_template() => $themeDirectory],

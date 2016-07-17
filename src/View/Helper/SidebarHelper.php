@@ -7,7 +7,7 @@ use Sarcofag\Exception\RuntimeException;
 class SidebarHelper implements HelperInterface
 {
     /**
-     * @var HelperManager
+     * @var HelperManagerInterface
      */
     protected $helperManager;
 
@@ -16,7 +16,7 @@ class SidebarHelper implements HelperInterface
      *
      * @param FactoryInterface $factory
      */
-    public function __construct(HelperManager $helperManager)
+    public function __construct(HelperManagerInterface $helperManager)
     {
         $this->helperManager = $helperManager;
     }

@@ -64,14 +64,13 @@ class ControllerPageMappingField extends CustomFieldAbstract implements ActionIn
                                     'argc' => 2]),
 
             $this->factory->make('ActionListener',
-                                   ['names' => ['admin_menu'],
+                                   ['names' => 'admin_menu',
                                     'callable' => function () { return $this->createSelectBox();}]),
-
             $this->factory->make('ActionListener',
-                                   ['names' => ['save_post'],
-                                    'callable' =>
-                                        function ($post_id, \WP_Post $post) {
-                                                return $this->saveSelectBoxValue($post_id, $post);},
+                                   ['names' => 'save_post',
+                                    'callable' => function ($post_id, \WP_Post $post = null) {
+                                        return $this->saveSelectBoxValue($post_id, $post);
+                                     },
                                     'priority' => 10,
                                     'argc' => 2])
         ];
@@ -168,6 +167,7 @@ class ControllerPageMappingField extends CustomFieldAbstract implements ActionIn
      */
     protected function saveSelectBoxValue($postId, \WP_Post $post)
     {
+        if (is_null($post)) return;
         
         if ( empty($_POST[$this->fieldName.'-nonce']) ||
                 !wp_verify_nonce( $_POST[$this->fieldName.'-nonce'], plugin_basename( __FILE__ ) ) )

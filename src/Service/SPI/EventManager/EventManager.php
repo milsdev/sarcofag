@@ -60,7 +60,10 @@ class EventManager implements EventManagerInterface
                  * @see WP::add_filter
                  */
                 $this->wpService->__call('add_'.strtolower($type),
-                                            [$name, $listener, $listener->getPriority(), $listener->getArgc()]);
+                                            [$name,
+                                             $listener->getCallable(),
+                                             $listener->getPriority(),
+                                             $listener->getArgc()]);
             }
         }
     }

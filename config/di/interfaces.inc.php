@@ -6,6 +6,9 @@ return [
     \Sarcofag\View\Renderer\PsrHttpRendererInterface::class =>
         DI\get(\Sarcofag\View\Renderer\SimpleRenderer::class),
 
+    \Sarcofag\View\Helper\HelperManagerInterface::class =>
+        DI\get('HelperManager'),
+
     \Sarcofag\Service\SPI\RegisterActionInterface::class =>
         DI\get('EventsRegistrator'),
 
