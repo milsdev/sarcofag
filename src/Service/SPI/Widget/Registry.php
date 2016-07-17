@@ -3,8 +3,8 @@ namespace Sarcofag\Service\SPI\Widget;
 
 use DI\FactoryInterface;
 use Sarcofag\Service\API\WP\WidgetFactory;
-use Sarcofag\Service\SPI\Action\ActionInterface;
-use Sarcofag\Service\SPI\Action\EventInterface;
+use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\Service\SPI\EventManager\ListenerInterface;
 
 class Registry implements ActionInterface
 {
@@ -56,9 +56,9 @@ class Registry implements ActionInterface
 
 
     /**
-     * @return EventInterface[]
+     * @return ListenerInterface[]
      */
-    public function getActionHandlers()
+    public function getActionListeners()
     {
         $widgetsInit = function () {
             foreach ($this->attached as $attachedItem) {
@@ -66,7 +66,7 @@ class Registry implements ActionInterface
             }
         };
 
-        return [$this->factory->make('ActionEvent', ['name' => 'widgets_init', 'callable' => $widgetsInit])];
+        return [$this->factory->make('ActionListener', ['names' => 'widgets_init', 'callable' => $widgetsInit])];
     }
 
 }

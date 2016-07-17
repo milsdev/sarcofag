@@ -15,7 +15,7 @@ class LayoutHelper implements HelperInterface
     /**
      * LayoutHelper constructor.
      *
-     * @param RendererInterface $simpleViewRenderer
+     * @param RendererInterface $renderer
      */
     public function __construct(RendererInterface $renderer)
     {

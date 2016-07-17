@@ -10,5 +10,8 @@ return [
         DI\get('EventsRegistrator'),
 
     \Sarcofag\Service\SPI\RegisterFilterInterface::class =>
-        DI\get('EventsRegistrator')
+        DI\get('EventsRegistrator'),
+
+    \Sarcofag\Service\SPI\EventManager\EventManagerInterface::class =>
+        DI\get('EventManager')
 ];

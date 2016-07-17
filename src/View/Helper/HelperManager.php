@@ -56,6 +56,7 @@ class HelperManager
      * @param string $name
      *
      * @return HelperInterface
+     * @throws \Exception
      */
     protected function getHelper($name)
     {

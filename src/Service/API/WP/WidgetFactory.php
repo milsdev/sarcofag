@@ -4,8 +4,8 @@ namespace Sarcofag\Service\API\WP;
 use DI\FactoryInterface;
 use Sarcofag\Exception\RuntimeException;
 use Sarcofag\Service\API\WP;
-use Sarcofag\Service\SPI\Action\ActionInterface;
-use Sarcofag\Service\SPI\Action\EventInterface;
+use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\Service\SPI\EventManager\ListenerInterface;
 
 final class WidgetFactory extends \WP_Widget_Factory implements ActionInterface
 {
@@ -57,12 +57,12 @@ final class WidgetFactory extends \WP_Widget_Factory implements ActionInterface
     }
 
     /**
-     * @return EventInterface[]
+     * @return ListenerInterface[]
      */
-    public function getActionHandlers()
+    public function getActionListeners ()
     {
-        return [$this->factory->make('ActionEvent',
-                                     ['name' => 'setup_theme',
+        return [$this->factory->make('ActionListener',
+                                     ['names' => 'setup_theme',
                                       'callable' => function () {
                                             $GLOBALS['wp_widget_factory'] = $this;
                                       }])];

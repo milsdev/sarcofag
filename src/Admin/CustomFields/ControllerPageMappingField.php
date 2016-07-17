@@ -1,12 +1,16 @@
 <?php
 namespace Sarcofag\Admin\CustomFields;
+use DI\FactoryInterface;
+use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\Service\SPI\EventManager\DataFilter\DataFilterInterface;
+use Sarcofag\Service\SPI\EventManager\ListenerInterface;
 use Sarcofag\View\Renderer\RendererInterface;
 
 /**
  * Class ControllerPageMappingField
  * @package Sarcofag\AdminExtensions\CustomFields
  */
-class ControllerPageMappingField extends CustomFieldAbstract
+class ControllerPageMappingField extends CustomFieldAbstract implements ActionInterface, DataFilterInterface
 {
     /**
      * Field name in html and identifier
@@ -30,30 +34,60 @@ class ControllerPageMappingField extends CustomFieldAbstract
     protected $viewRenderer = null;
 
     /**
-     * ControllerPageMappingField constructor.
+     * @var FactoryInterface
      */
-    public function __construct(RendererInterface $viewRenderer)
-    {
-        $this->viewRenderer = $viewRenderer;
-    }
+    protected $factory;
 
     /**
      * ControllerPageMappingField constructor.
+     *
+     * @param RendererInterface $viewRenderer
+     * @param FactoryInterface $factory
      */
-    public function register()
+    public function __construct(RendererInterface $viewRenderer, FactoryInterface $factory)
     {
-        add_filter('manage_page_posts_columns', function ($defaults) { return $this->showColumnsHead($defaults);}, 10);
-        add_action('manage_page_posts_custom_column', function ($column_name, $post_ID) {
-            return $this->showColumnsContent($column_name, $post_ID);
-        }, 10, 2);
-        add_filter('manage_post_posts_columns', function ($defaults) { return $this->showColumnsHead($defaults);}, 10);
-        add_action('manage_post_posts_custom_column', function ($column_name, $post_ID) {
-            return $this->showColumnsContent($column_name, $post_ID);
-        }, 10, 2);
-        add_action( 'admin_menu', function () { return $this->createSelectBox();});
-        add_action( 'save_post', function ($post_id, \WP_Post $post) {
-            return $this->saveSelectBoxValue($post_id, $post);
-        }, 10, 2 );
+        $this->viewRenderer = $viewRenderer;
+        $this->factory = $factory;
+    }
+
+    /**
+     * @return ListenerInterface[]
+     */
+    public function getActionListeners()
+    {
+        return [
+            $this->factory->make('ActionListener',
+                                   ['names' => ['manage_page_posts_custom_column',
+                                                'manage_post_posts_custom_column' ],
+                                    'callable' => function ($defaults) { return $this->showColumnsHead($defaults);},
+                                    'priority' => 10,
+                                    'argc' => 2]),
+
+            $this->factory->make('ActionListener',
+                                   ['names' => ['admin_menu'],
+                                    'callable' => function () { return $this->createSelectBox();}]),
+
+            $this->factory->make('ActionListener',
+                                   ['names' => ['save_post'],
+                                    'callable' =>
+                                        function ($post_id, \WP_Post $post) {
+                                                return $this->saveSelectBoxValue($post_id, $post);},
+                                    'priority' => 10,
+                                    'argc' => 2])
+        ];
+    }
+
+    /**
+     * @return ListenerInterface[]
+     */
+    public function getDataFilterListeners()
+    {
+        return [
+            $this->factory->make('DataFilterListener',
+                                    ['names' => ['manage_page_posts_columns', 'manage_post_posts_columns', ],
+                                     'callable' => function ($defaults) { return $this->showColumnsHead($defaults);},
+                                     'priority' => 10]),
+        ];
     }
 
     /**
@@ -130,7 +164,7 @@ class ControllerPageMappingField extends CustomFieldAbstract
      * @param number $postId
      * @param \WP_Post $post
      *
-     * @return mixed
+     * @return void
      */
     protected function saveSelectBoxValue($postId, \WP_Post $post)
     {
@@ -168,6 +202,8 @@ class ControllerPageMappingField extends CustomFieldAbstract
         $objects = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(get_template_directory() . '/src/api/Controller'),
                                             \RecursiveIteratorIterator::SELF_FIRST);
+
+        $controllers = [];
         
         foreach($objects as $name => $object){ /* @var $object \SplFileInfo */
             if ($object->isDir()) continue;

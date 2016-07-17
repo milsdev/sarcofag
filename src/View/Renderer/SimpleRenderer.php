@@ -14,9 +14,9 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
     protected $helperManager;
 
     /**
-     * @var string
+     * @var array
      */
-    protected $templatePath;
+    protected $templateConfig;
 
     /**
      * @var WP

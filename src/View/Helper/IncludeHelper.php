@@ -34,9 +34,9 @@ class IncludeHelper implements HelperInterface
         }
 
         if (array_key_exists(1, $arguments) && is_array($arguments[1])) {
-            return $this->renderer->render($spliced[0], $arguments[1]);
+            return $this->renderer->render($arguments[0], $arguments[1]);
         } else {
-            return $this->renderer->render($spliced[0]);
+            return $this->renderer->render($arguments[0]);
         }
     }
 }

@@ -3,7 +3,8 @@ namespace Sarcofag\Service\SPI\Sidebar;
 
 use DI\FactoryInterface;
 use Sarcofag\Service\API\WP;
-use Sarcofag\Service\SPI\Action\ActionInterface;
+use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\Service\SPI\EventManager\ListenerInterface;
 use Sarcofag\Service\SPI\Sidebar\SidebarEntryInterface;
 
 class Registry implements ActionInterface
@@ -48,9 +49,9 @@ class Registry implements ActionInterface
     }
 
     /**
-     * @return EventInterface[]
+     * @return ListenerInterface[]
      */
-    public function getActionHandlers()
+    public function getActionListeners()
     {
         $sidebarsInit = function () {
             foreach ($this->attached as $attachedItem) {
@@ -68,6 +69,6 @@ class Registry implements ActionInterface
             }
         };
     
-        return [$this->factory->make('ActionEvent', ['name' => 'widgets_init', 'callable' => $sidebarsInit])];
+        return [$this->factory->make('ActionListener', ['names' => 'widgets_init', 'callable' => $sidebarsInit])];
     }
 }

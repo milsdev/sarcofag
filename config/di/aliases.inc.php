@@ -3,6 +3,6 @@ use Interop\Container\ContainerInterface;
 use DI\Factory\RequestedEntry;
 
 return [
-    'ActionEvent' => DI\object('Sarcofag\Service\SPI\Action\ActionEvent'),
-    'FilterEvent' => DI\object('Sarcofag\Service\SPI\Filter\FilterEvent')
+    'ActionListener' => DI\object('Sarcofag\Service\SPI\EventManager\GenericListener'),
+    'DataFilterListener' => DI\object('Sarcofag\Service\SPI\EventManager\GenericListener')
 ];

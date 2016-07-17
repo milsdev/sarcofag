@@ -3,7 +3,6 @@ namespace Sarcofag\Service\SPI\Widget;
 
 use Sarcofag\Exception\RuntimeException;
 use Sarcofag\Service\API\WP\Widget as WPWidget;
-use Sarcofag\View\Renderer\AbstractRenderer;
 use Sarcofag\View\Renderer\RendererInterface;
 
 class GenericWidget implements WidgetInterface, PersistableInterface
@@ -67,7 +66,7 @@ class GenericWidget implements WidgetInterface, PersistableInterface
      */
     public function filter(WPWidget $wpWidget, $oldSettings, $newSettings)
     {
-        return $this->filter->filter($oldSettings, $newSettings);
+        return $this->filtrationService->filter($oldSettings, $newSettings);
     }
 
     /**

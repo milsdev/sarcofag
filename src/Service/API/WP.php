@@ -2773,6 +2773,10 @@ namespace Sarcofag\Service\API;
  */
 class WP
 {
+
+    const EVENT_TYPE_ACTION = 'action';
+    const EVENT_TYPE_FILTER = 'filter';
+
     /**
      * @param string $functionName
      * @param array $args

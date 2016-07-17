@@ -1,7 +1,7 @@
 <?php
 namespace Sarcofag\Service\SPI\Widget;
 
-use Sarcofag\Service\API\WP\Widget;
+use Sarcofag\Service\API\WP\Widget as WPWidget;
 
 interface WidgetInterface
 {
@@ -20,5 +20,5 @@ interface WidgetInterface
      *
      * @return string
      */
-    public function render(Widget $wpWidget, array $placeholderParams = [], array $settings);
+    public function render(WPWidget $wpWidget, array $placeholderParams = [], array $settings);
 }

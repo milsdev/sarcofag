@@ -9,7 +9,7 @@ interface FiltrationInterface
      * Method return filtered settings
      * to persist for current WP Widget.
      *
-     * @param WPWidget $wpWidget
+     * @param Widget $wpWidget
      * @param array $oldSettings
      * @param array $newSettings
      *

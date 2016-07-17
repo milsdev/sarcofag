@@ -34,6 +34,9 @@ final class Widget extends \WP_Widget
 
     /**
      * @see \WP_Widget::widget()
+     *
+     * @param $args
+     * @param $instance
      */
     public function widget( $args, $instance )
     {
@@ -42,6 +45,11 @@ final class Widget extends \WP_Widget
 
     /**
      * @see \WP_Widget::update()
+     *
+     * @param $newSettings
+     * @param $oldSettings
+     *
+     * @return array
      */
     public function update( $newSettings, $oldSettings )
     {
@@ -54,6 +62,8 @@ final class Widget extends \WP_Widget
 
     /**
      * @see \WP_Widget::form()
+     *
+     * @param $settings
      */
     public function form( $settings )
     {
