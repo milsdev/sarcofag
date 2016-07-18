@@ -13,6 +13,13 @@ interface WidgetInterface
     public function getName();
 
     /**
+     * Return the id of the widget
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
      * @param WPWidget $wpWidget
      * @param array $placeholderParams Display arguments including 'before_title', 'after_title',
      *                                  'before_widget', and 'after_widget'.

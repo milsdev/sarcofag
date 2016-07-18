@@ -33,20 +33,28 @@ class GenericWidget implements WidgetInterface, PersistableInterface
     protected $widgetName;
 
     /**
+     * @var string
+     */
+    protected $widgetId;
+
+    /**
      * GenericWidget constructor.
      *
+     * @param string $widgetId
      * @param string $widgetName
      * @param string $adminTemplate
      * @param string $themeTemplate
      * @param FiltrationInterface $filtrationService [OPTIONAL]
      * @param RendererInterface $renderer
      */
-    public function __construct($widgetName,
+    public function __construct($widgetId,
+                                $widgetName,
                                 $adminTemplate,
                                 $themeTemplate,
                                 RendererInterface $renderer,
                                 FiltrationInterface $filtrationService = null)
     {
+        $this->widgetId = $widgetId;
         $this->widgetName = $widgetName;
         $this->adminTemplate = $adminTemplate;
         $this->themeTemplate = $themeTemplate;
@@ -81,6 +89,16 @@ class GenericWidget implements WidgetInterface, PersistableInterface
     public function getName()
     {
         return $this->widgetName;
+    }
+
+    /**
+     * Return the id of the widget
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->widgetId;
     }
 
 

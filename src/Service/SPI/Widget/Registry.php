@@ -45,7 +45,7 @@ class Registry implements ActionInterface
     public function attach(WidgetInterface $widget, array $widgetOptions = [])
     {
         $wrapped = $this->factory->make('Sarcofag\Service\API\WP\Widget',
-                                        ['widgetId' => md5($widget->getName()),
+                                        ['widgetId' => $widget->getId(),
                                          'widgetName' => $widget->getName(),
                                          'widgetOptions' => $widgetOptions,
                                          'widget' => $widget]);
