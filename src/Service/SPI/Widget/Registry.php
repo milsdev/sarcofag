@@ -37,25 +37,15 @@ class Registry implements ActionInterface
     }
 
     /**
-     * @param WidgetInterface $widget
-     * @param array $widgetOptions
+     * @param string $widgetClassNameOrAlias
      *
      * @return $this
      */
-    public function attach(WidgetInterface $widget, array $widgetOptions = [])
+    public function attach($widgetClassNameOrAlias)
     {
         $wrapped = $this->factory->make('Sarcofag\Service\API\WP\Widget',
-                                        ['widgetId' => $widget->getId(),
-                                         'widgetName' => $widget->getName(),
-                                         'widgetOptions' => $widgetOptions,
-                                         'widget' => $widget]);
-
-        if ($widget instanceof GenericWidget) {
-            $this->attached[md5($widget->getName())] = $wrapped;
-        } else {
-            $this->attached[] = $wrapped;
-        }
-
+                                        ['widgetClassNameOrAlias' => $widgetClassNameOrAlias]);
+        $this->attached[] = $wrapped;
         return $this;
     }
 
@@ -67,11 +57,7 @@ class Registry implements ActionInterface
     {
         $widgetsInit = function () {
             foreach ($this->attached as $k=>$attachedItem) {
-                if (is_numeric($k)) {
-                    $this->widgetFactory->register($attachedItem);
-                } else {
-                    $this->widgetFactory->register($attachedItem, $k);
-                }
+                $this->widgetFactory->register($attachedItem, $attachedItem->getId());
             }
         };
 

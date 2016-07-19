@@ -10,10 +10,9 @@ interface PersistableInterface extends FiltrationInterface
      * for the form displayed in the
      * Admin WP Area.
      *
-     * @param Widget $wpWidget
      * @param array $settings
      *
      * @return mixed
      */
-    public function renderForm(Widget $wpWidget, $settings);
+    public function renderForm($settings);
 }

@@ -1,22 +1,13 @@
 <?php
 namespace Sarcofag\Service\SPI\Widget;
 
-use Sarcofag\Exception\RuntimeException;
 use Sarcofag\Service\API\WP\Widget as WPWidget;
+use Sarcofag\Service\SPI\Widget\Params\BasicInterface;
+use Sarcofag\Service\SPI\Widget\Params\RenderableInterface;
 use Sarcofag\View\Renderer\RendererInterface;
 
 class GenericWidget implements WidgetInterface, PersistableInterface
 {
-    /**
-     * @var string
-     */
-    protected $adminTemplate;
-
-    /**
-     * @var string
-     */
-    protected $themeTemplate;
-
     /**
      * @var FiltrationInterface
      */
@@ -28,103 +19,79 @@ class GenericWidget implements WidgetInterface, PersistableInterface
     protected $renderer;
 
     /**
-     * @var string
+     * @var WPWidget
      */
-    protected $widgetName;
+    protected $wpWidget;
 
     /**
-     * @var string
+     * @var RenderableInterface
      */
-    protected $widgetId;
-
+    protected $params;
+    
     /**
      * GenericWidget constructor.
      *
-     * @param string $widgetId
-     * @param string $widgetName
-     * @param string $adminTemplate
-     * @param string $themeTemplate
-     * @param FiltrationInterface $filtrationService [OPTIONAL]
-     * @param RendererInterface $renderer
+     * @param RenderableInterface $widgetParams
+     * @param WPWidget $wpWidget
+     * @param FiltrationInterface|null $filtrationService
      */
-    public function __construct($widgetId,
-                                $widgetName,
-                                $adminTemplate,
-                                $themeTemplate,
-                                RendererInterface $renderer,
+    public function __construct(RenderableInterface $widgetParams,
+                                WPWidget $wpWidget,
                                 FiltrationInterface $filtrationService = null)
     {
-        $this->widgetId = $widgetId;
-        $this->widgetName = $widgetName;
-        $this->adminTemplate = $adminTemplate;
-        $this->themeTemplate = $themeTemplate;
+        $this->params = $widgetParams;
         $this->filtrationService = $filtrationService;
-        $this->renderer = $renderer;
+        $this->renderer = $widgetParams->getRenderer();
+        $this->wpWidget = $wpWidget;
     }
 
     /**
      * Method return filtered settings
      * to persist for current WP Widget.
      *
-     * @param WPWidget $wpWidget
      * @param array $newSettings
      * @param array $oldSettings
      *
      * @return array Return filtered settings
      */
-    public function filter(WPWidget $wpWidget, $newSettings, $oldSettings)
+    public function filter($newSettings, $oldSettings)
     {
         if (is_null($this->filtrationService)) {
             return $newSettings;
         }
 
-        return $this->filtrationService->filter($wpWidget, $newSettings, $oldSettings);
+        return $this->filtrationService->filter($newSettings, $oldSettings);
     }
 
     /**
-     * Return the name of the widget
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->widgetName;
-    }
-
-    /**
-     * Return the id of the widget
-     *
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->widgetId;
-    }
-
-
-    /**
-     * @param WPWidget $wpWidget
      * @param array $placeholderParams
      * @param array $settings
      *
      * @return string
      */
-    public function render(WPWidget $wpWidget, array $placeholderParams = [], array $settings)
+    public function render(array $placeholderParams = [], array $settings)
     {
-        return $this->renderer->render($this->themeTemplate, 
-                                        $placeholderParams + ['wpWidget' => $wpWidget, 
+        return $this->renderer->render($this->params->getThemeTemplate(),
+                                        $placeholderParams + ['wpWidget' => $this->wpWidget,
                                                               'settings' => $settings]);
     }
 
     /**
-     * @param WPWidget $wpWidget
+     * @return BasicInterface
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
      * @param array $settings
      *
      * @return string
      */
-    public function renderForm(WPWidget $wpWidget, $settings)
+    public function renderForm($settings)
     {
-        return $this->renderer->render($this->adminTemplate, ['wpWidget' => $wpWidget,
-                                                              'settings' => $settings]);
+        return $this->renderer->render($this->params->getAdminTemplate(),
+                                       ['wpWidget' => $this->wpWidget, 'settings' => $settings]);
     }
 }

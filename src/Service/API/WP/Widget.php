@@ -1,6 +1,8 @@
 <?php
 namespace Sarcofag\Service\API\WP;
 
+use DI\FactoryInterface;
+use Sarcofag\Exception\RuntimeException;
 use Sarcofag\Service\SPI\Widget\PersistableInterface;
 use Sarcofag\Service\SPI\Widget\FiltrationInterface;
 use Sarcofag\Service\SPI\Widget\WidgetInterface;
@@ -14,22 +16,51 @@ use Sarcofag\View\Renderer\RendererInterface;
 final class Widget extends \WP_Widget
 {
     /**
-     * @var WidgetInterface
+     * @HACK
+     * @FIXME PLEASE SOMETIMES IN FUTURE
+     * It is hacky property. So i need to have a closure which
+     * will return real instance of the created WidgetInterface instance
+     * because Wordpress when checking is_active_widget it is uses
+     * construction like == in expression $wp_registered_widgets[$widget]['callback'] == $callback
+     * and it is couse an error like [Fatal error: Nesting level too deep - recursive dependency?]
+     * It is a bit described here http://stackoverflow.com/questions/3834791/fatal-error-nesting-level-too-deep-recursive-dependency
+     * So for now, i have to hide from object the instance via closure, because closure
+     * does not expose it is context.
+     *
+     * @var \Closure
+     * @return WidgetInterface
      */
-    protected $instance;
+    private $getInstance;
 
     /**
      * Widget constructor.
      *
-     * @param string $widgetId
-     * @param string $widgetName
-     * @param array $widgetOptions
-     * @param WidgetInterface $widget
+     * @param string $widgetClassNameOrAlias
+     * @param FactoryInterface $factory
      */
-    public function __construct($widgetId, $widgetName, array $widgetOptions, WidgetInterface $widget)
+    public function __construct($widgetClassNameOrAlias, FactoryInterface $factory)
     {
-        $this->instance = $widget;
-        parent::__construct($widgetId, $widgetName, $widgetOptions);
+        $instance = $factory->make($widgetClassNameOrAlias, ['wpWidget'=>$this]);
+
+        if (!in_array(WidgetInterface::class, class_implements($instance))) {
+            throw new RuntimeException("Incorrect widget class name or widget does not implement WidgetInterface");
+        }
+
+        $this->getInstance = function () use ($instance) {
+            return $instance;
+        };
+
+        $params = $instance->getParams();
+
+        parent::__construct($params->getId(),
+                            $params->getName(),
+                            $params->getOptions());
+    }
+
+    public function getId()
+    {
+        $getInstance = $this->getInstance;
+        return $getInstance()->getParams()->getId();
     }
 
     /**
@@ -40,7 +71,8 @@ final class Widget extends \WP_Widget
      */
     public function widget( $args, $instance )
     {
-        echo $this->instance->render($this, $args, $instance);
+        $getInstance = $this->getInstance;
+        echo $getInstance()->render($args, $instance);
     }
 
     /**
@@ -53,8 +85,10 @@ final class Widget extends \WP_Widget
      */
     public function update( $newSettings, $oldSettings )
     {
-        if ($this->instance instanceof FiltrationInterface) {
-            return $this->instance->filter($this, $newSettings, $oldSettings);
+        $getInstance = $this->getInstance;
+        $instance = $getInstance();
+        if ($instance instanceof FiltrationInterface) {
+            return $instance->filter($newSettings, $oldSettings);
         } else {
             return $newSettings;
         }
@@ -67,11 +101,13 @@ final class Widget extends \WP_Widget
      */
     public function form( $settings )
     {
-        if (!$this->instance instanceof PersistableInterface) {
+        $getInstance = $this->getInstance;
+        $instance = $getInstance();
+        if (!$instance instanceof PersistableInterface) {
             echo '<p class="no-options-widget">' . __('There are no options for this widget.') . '</p>';
             return 'noform';
         } else {
-            echo $this->instance->renderForm($this, $settings);
+            echo $instance->renderForm($settings);
         }
     }
 }
