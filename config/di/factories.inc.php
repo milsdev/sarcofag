@@ -17,16 +17,17 @@ return [
         return $pdo;
     },
 
-    Sarcofag\View\Renderer\SimpleRenderer::class => function (ContainerInterface $container) {
+    'Renderer' => function (ContainerInterface $container) {
         /* @var $themeEntity WP_Theme */
-        $themeEntity = $container->get(\Sarcofag\Service\API\WP::class)->wp_get_theme();
+        $themeEntity = $container->get(\Sarcofag\API\WP::class)->wp_get_theme();
         $themeDirectory = $themeEntity->get_template_directory() . '/src/api/view';
 
-        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('HelperManager'),
-                                                               ['admin' => __DIR__ . '/../../src/admin/view',
-                                                                'theme' => __DIR__ . '/../../src/theme/view',
-                                                                $themeEntity->get_template() => $themeDirectory],
-                                                                $container->get('Sarcofag\Service\API\WP'));
+        $paths = array_map('realpath',
+                            array_merge($container->get('template.paths'),
+                                        [$themeEntity->get_template() => $themeDirectory]));
+        
+        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('HelperManager'), $paths,
+                                                               $container->get('Sarcofag\API\WP'));
         return $renderer;
     },
 

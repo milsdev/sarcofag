@@ -1,7 +1,7 @@
 <?php
 namespace Sarcofag\View\Renderer;
 
-use Sarcofag\Service\API\WP;
+use Sarcofag\API\WP;
 use Sarcofag\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use Sarcofag\View\Helper\HelperManagerInterface;

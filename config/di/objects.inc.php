@@ -16,4 +16,8 @@ return [
                                         'include', \Sarcofag\View\Helper\IncludeHelper::class)
                            ->method('addViewHelper',
                                         'sidebar', \Sarcofag\View\Helper\SidebarHelper::class)
+                           ->method('addViewHelper',
+                                        'includeUIComponent',
+                                        \Sarcofag\View\Helper\UIComponentHelper::class,
+                                        ['uiComponentPaths' => DI\get('ui.js.paths')])
 ];

@@ -1,9 +1,9 @@
 <?php
 namespace Sarcofag\Admin\CustomFields;
 use DI\FactoryInterface;
-use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
-use Sarcofag\Service\SPI\EventManager\DataFilter\DataFilterInterface;
-use Sarcofag\Service\SPI\EventManager\ListenerInterface;
+use Sarcofag\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\SPI\EventManager\DataFilter\DataFilterInterface;
+use Sarcofag\SPI\EventManager\ListenerInterface;
 use Sarcofag\View\Renderer\RendererInterface;
 
 /**

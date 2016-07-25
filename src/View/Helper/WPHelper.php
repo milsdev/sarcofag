@@ -2,7 +2,7 @@
 namespace Sarcofag\View\Helper;
 
 use Sarcofag\Exception\RuntimeException;
-use Sarcofag\Service\API\WP;
+use Sarcofag\API\WP;
 
 
 class WPHelper extends WP implements HelperInterface

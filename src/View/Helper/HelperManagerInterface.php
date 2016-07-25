@@ -9,10 +9,11 @@ interface HelperManagerInterface
     /**
      * @param string $helperName
      * @param string $viewHelperClassName
+     * @param array $helperArgs
      *
      * @throws \Exception
      */
-    public function addViewHelper($helperName, $viewHelperClassName);
+    public function addViewHelper($helperName, $viewHelperClassName, $helperArgs = []);
 
     /**
      * @param string $helperName

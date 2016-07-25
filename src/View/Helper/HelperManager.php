@@ -29,17 +29,18 @@ class HelperManager implements HelperManagerInterface
     /**
      * @param string $helperName
      * @param string $viewHelperClassName
+     * @param array $helperArgs [OPTIONAL]
      *
      * @throws \Exception
      */
-    public function addViewHelper($helperName, $viewHelperClassName)
+    public function addViewHelper($helperName, $viewHelperClassName, $helperArgs = [])
     {
         if (!class_exists($viewHelperClassName) ||
                 !in_array(HelperInterface::class, class_implements($viewHelperClassName))) {
             throw new RuntimeException("Incorrect helper class name or Helper do not implement HelperInterface");
         }
         
-        $this->helpers[$helperName] = $viewHelperClassName;
+        $this->helpers[$helperName] = [$viewHelperClassName, $helperArgs];
     }
 
     /**
@@ -62,7 +63,7 @@ class HelperManager implements HelperManagerInterface
     {
         if (array_key_exists($name, $this->helpers)) {
             if (!is_object($this->helpers[$name])) {
-                $this->helpers[$name] = $this->factory->make($this->helpers[$name]);
+                $this->helpers[$name] = $this->factory->make($this->helpers[$name][0], $this->helpers[$name][1]);
             }
 
             return $this->helpers[ $name ];

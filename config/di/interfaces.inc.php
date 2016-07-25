@@ -1,20 +1,20 @@
 <?php
 return [
     \Sarcofag\View\Renderer\RendererInterface::class =>
-        DI\get(\Sarcofag\View\Renderer\SimpleRenderer::class),
+        DI\get('Renderer'),
 
     \Sarcofag\View\Renderer\PsrHttpRendererInterface::class =>
-        DI\get(\Sarcofag\View\Renderer\SimpleRenderer::class),
+        DI\get('Renderer'),
 
     \Sarcofag\View\Helper\HelperManagerInterface::class =>
         DI\get('HelperManager'),
 
-    \Sarcofag\Service\SPI\RegisterActionInterface::class =>
+    \Sarcofag\SPI\RegisterActionInterface::class =>
         DI\get('EventsRegistrator'),
 
-    \Sarcofag\Service\SPI\RegisterFilterInterface::class =>
+    \Sarcofag\SPI\RegisterFilterInterface::class =>
         DI\get('EventsRegistrator'),
 
-    \Sarcofag\Service\SPI\EventManager\EventManagerInterface::class =>
+    \Sarcofag\SPI\EventManager\EventManagerInterface::class =>
         DI\get('EventManager')
 ];

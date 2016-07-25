@@ -2,11 +2,11 @@
 namespace SarcofagTest\Service\SPI\EventManager;
 
 use Sarcofag\Exception\RuntimeException;
-use Sarcofag\Service\API\WP;
-use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
-use Sarcofag\Service\SPI\EventManager\DataFilter\DataFilterInterface;
-use Sarcofag\Service\SPI\EventManager\EventManager;
-use Sarcofag\Service\SPI\EventManager\ListenerInterface;
+use Sarcofag\API\WP;
+use Sarcofag\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\SPI\EventManager\DataFilter\DataFilterInterface;
+use Sarcofag\SPI\EventManager\EventManager;
+use Sarcofag\SPI\EventManager\ListenerInterface;
 
 class EventManagerTest extends \PHPUnit_Framework_TestCase
 {

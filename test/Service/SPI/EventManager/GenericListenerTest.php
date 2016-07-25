@@ -1,7 +1,7 @@
 <?php
 namespace SarcofagTest\Service\SPI\EventManager;
 
-use Sarcofag\Service\SPI\EventManager\GenericListener;
+use Sarcofag\SPI\EventManager\GenericListener;
 
 class GenericListenerTest extends \PHPUnit_Framework_TestCase
 {

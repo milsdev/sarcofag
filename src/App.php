@@ -1,21 +1,12 @@
 <?php
-/*
-Plugin Name: Sarcofag
-Plugin URI: http://milsdev.com/
-Description: OOP wrapper for the WordPress
-Version: 0.0-alpha
-Author: Mil's
-Author URI: http://milsdev.com/
-*/
-
 namespace Sarcofag;
 
 use DI;
-use Sarcofag\Service\API\WP;
+use Sarcofag\API\WP;
 use Slim;
 use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
-use Sarcofag\Service\SPI\EventManager\Action\ActionInterface;
-use Sarcofag\Service\SPI\EventManager\ListenerInterface;
+use Sarcofag\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\SPI\EventManager\ListenerInterface;
 
 class App implements ActionInterface
 {
