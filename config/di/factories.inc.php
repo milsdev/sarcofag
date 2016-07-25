@@ -2,11 +2,6 @@
 use Interop\Container\ContainerInterface;
 
 return [
-    'settings' => function () {
-            return require __DIR__ . '/../config.inc.php';
-    },
-
-
     PDO::class => function (ContainerInterface $container) {
         $settings = $container->get('settings')['db'];
         $pdo = new \PDO("mysql:host={$settings['host']};dbname={$settings['dbname']};charset=utf8",
