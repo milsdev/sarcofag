@@ -7,8 +7,6 @@ return [
 
     'HelperManager' => DI\object(Sarcofag\View\Helper\HelperManager::class)
                            ->method('addViewHelper',
-                                        'screen', \Sarcofag\View\Helper\ScreenSizeDetectionHelper::class)
-                           ->method('addViewHelper',
                                         'wp', \Sarcofag\View\Helper\WPHelper::class)
                            ->method('addViewHelper',
                                         'layout', \Sarcofag\View\Helper\LayoutHelper::class)
