@@ -17,5 +17,17 @@ return [
                            ->method('addViewHelper',
                                         'includeUIComponent',
                                         \Sarcofag\View\Helper\UIComponentHelper::class,
-                                        ['uiComponentPaths' => DI\get('ui.js.paths')])
+                                        ['uiComponentPaths' => DI\get('ui.js.paths')]),
+
+    'ValidatorChain' => DI\object(\Zend\Validator\ValidatorChain::class)
+                           ->method('setPluginManager',
+                                    DI\object(\Zend\Validator\ValidatorPluginManager::class)
+                                        ->constructor(DI\get(DI\Container::class)))
+                           ->scope(\DI\Scope::PROTOTYPE),
+
+    'InputFilterFactory' => DI\object(Zend\InputFilter\Factory::class)
+                                            ->constructor(DI\object(Zend\InputFilter\InputFilterPluginManager::class)
+                                                            ->constructor(DI\get(DI\Container::class)))
+                                            ->method('setDefaultValidatorChain', DI\get('ValidatorChain'))
+                            ->scope(\DI\Scope::PROTOTYPE)
 ];
