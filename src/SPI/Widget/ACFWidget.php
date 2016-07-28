@@ -1,6 +1,7 @@
 <?php
 namespace Sarcofag\SPI\Widget;
 
+use Sarcofag\API\ACF\ACFField;
 use Sarcofag\Exception\RuntimeException;
 use Sarcofag\API\WP;
 use Sarcofag\API\WP\Widget as WPWidget;
@@ -10,25 +11,25 @@ use Sarcofag\View\Renderer\RendererInterface;
 class ACFWidget extends GenericWidget
 {
     /**
-     * @var WP
+     * @var ACFField
      */
-    protected $wpService;
+    protected $acfField;
 
     /**
      * ACFWidget constructor.
      *
      * @param RenderableInterface $widgetParams
      * @param WPWidget $wpWidget
-     * @param WP $wpService
+     * @param ACFField $acfField
      * @param FiltrationInterface|null $filtrationService
      */
     public function __construct(RenderableInterface $widgetParams,
                                 WPWidget $wpWidget,
-                                WP $wpService,
+                                ACFField $acfField,
                                 FiltrationInterface $filtrationService = null)
     {
         parent::__construct($widgetParams, $wpWidget, $filtrationService);
-        $this->wpService = $wpService;
+        $this->acfField = $acfField;
     }
 
     /**
@@ -38,7 +39,7 @@ class ACFWidget extends GenericWidget
      */
     protected function getField($name)
     {
-        return $this->wpService->get_field($name, 'widget_'.$this->wpWidget->id);
+        return $this->acfField->getWidgetField($name, $this->wpWidget->id);
     }
 
     /**
