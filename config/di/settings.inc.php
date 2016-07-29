@@ -2,7 +2,7 @@
 return [
     'template.paths' => ['admin' => __DIR__ . '/../../src/admin/view',
                          'theme' => __DIR__ . '/../../src/theme/view'],
-    'ui.js.paths' => [],
+    'ui.js.path.mapping' => [],
     'autoloader.paths' => [],
     'settings' => [
         'outputBuffering'=>'append',

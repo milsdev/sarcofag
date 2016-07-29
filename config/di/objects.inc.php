@@ -13,11 +13,7 @@ return [
                            ->method('addViewHelper',
                                         'include', \Sarcofag\View\Helper\IncludeHelper::class)
                            ->method('addViewHelper',
-                                        'sidebar', \Sarcofag\View\Helper\SidebarHelper::class)
-                           ->method('addViewHelper',
-                                        'includeUIComponent',
-                                        \Sarcofag\View\Helper\UIComponentHelper::class,
-                                        ['uiComponentPaths' => DI\get('ui.js.paths')]),
+                                        'sidebar', \Sarcofag\View\Helper\SidebarHelper::class),
 
     'ValidatorChain' => DI\object(\Zend\Validator\ValidatorChain::class)
                            ->method('setPluginManager',
