@@ -55,9 +55,5 @@ return [
 
     'callableResolver' => function (ContainerInterface $container) {
         return new \Slim\CallableResolver($container);
-    },
-
-    'renderer' => function (ContainerInterface $container) {
-        return $container->get(Slim\Views\PhpRenderer::class);
     }
 ];
