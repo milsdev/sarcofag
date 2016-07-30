@@ -40,7 +40,7 @@ class AbstractFactory implements AbstractFactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         if ($container instanceof Container) {
-            return $container->make($requestedName, $options);
+            return $container->make($requestedName, $options ? $options : []);
         } else {
             return $container->get($requestedName);
         }
