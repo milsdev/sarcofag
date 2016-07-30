@@ -18,12 +18,14 @@ return [
     'ValidatorChain' => DI\object(\Zend\Validator\ValidatorChain::class)
                            ->method('setPluginManager',
                                     DI\object(\Zend\Validator\ValidatorPluginManager::class)
-                                        ->constructor(DI\get(DI\Container::class)))
+                                        ->constructor(DI\get(DI\Container::class),
+                                                      DI\get('zend.servicemanager.settings')))
                            ->scope(\DI\Scope::PROTOTYPE),
 
     'InputFilterFactory' => DI\object(Zend\InputFilter\Factory::class)
                                             ->constructor(DI\object(Zend\InputFilter\InputFilterPluginManager::class)
-                                                            ->constructor(DI\get(DI\Container::class)))
+                                                            ->constructor(DI\get(DI\Container::class),
+                                                                          DI\get('zend.servicemanager.settings')))
                                             ->method('setDefaultValidatorChain', DI\get('ValidatorChain'))
                             ->scope(\DI\Scope::PROTOTYPE)
 ];

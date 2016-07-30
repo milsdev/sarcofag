@@ -1,5 +1,9 @@
 <?php
 return [
+    'zend.servicemanager.settings' => [
+        'abstract_factories' => [\Sarcofag\API\Zend\AbstractFactory::class]
+    ],
+
     'template.paths' => ['admin' => __DIR__ . '/../../src/admin/view',
                          'theme' => __DIR__ . '/../../src/theme/view'],
     'ui.js.path.mapping' => [],
