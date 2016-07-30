@@ -44,4 +44,23 @@ class ACFField
         
         return $this->wpService->get_field($name, 'widget_'.$this->widgetIdFilter->filter($widgetId));
     }
+
+    /**
+     * @param string $name
+     * @param number $postId
+     *
+     * @return mixed
+     */
+    public function getPostFields($idOrName, $postId = null)
+    {
+        if (!class_exists( 'acf' )) {
+            throw new RuntimeException('ACF plugin not active.');
+        }
+
+        if (is_numeric($idOrName) && $postId === null) {
+            return $this->wpService->get_fields($idOrName);
+        }
+
+        return $this->wpService->get_field($idOrName, $postId);
+    }
 }
