@@ -27,5 +27,12 @@ return [
                                                             ->constructor(DI\get(DI\Container::class),
                                                                           DI\get('zend.servicemanager.settings')))
                                             ->method('setDefaultValidatorChain', DI\get('ValidatorChain'))
-                            ->scope(\DI\Scope::PROTOTYPE)
+                            ->scope(\DI\Scope::PROTOTYPE),
+
+    'NotFoundController' => DI\object(Sarcofag\Theme\Controller\SimpleRendererController::class)
+        ->constructorParameter('templateToRender', DI\get('page.notfound')),
+    'ErrorController' => DI\object(Sarcofag\Theme\Controller\SimpleRendererController::class)
+        ->constructorParameter('templateToRender', DI\get('page.error')),
+    'NotAllowedController' => DI\object(Sarcofag\Theme\Controller\SimpleRendererController::class)
+        ->constructorParameter('templateToRender', DI\get('page.notallowed'))
 ];

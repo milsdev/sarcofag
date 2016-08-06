@@ -7,6 +7,9 @@ return [
     'template.paths' => ['admin' => __DIR__ . '/../../src/admin/view',
                          'theme' => __DIR__ . '/../../src/theme/view'],
     'ui.js.path.mapping' => [],
+    'page.notfound' => 'theme/script/notfound.phtml',
+    'page.notallowed' => 'theme/script/notallowed.phtml',
+    'page.error' => 'theme/script/error.phtml',
     'autoloader.paths' => [],
     'settings' => [
         'outputBuffering'=>'append',

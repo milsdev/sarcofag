@@ -26,17 +26,9 @@ return [
         return $renderer;
     },
 
-    'errorHandler' => function (ContainerInterface $container) {
-            return new \Slim\Handlers\Error($container->get('settings')['displayErrorDetails']);
-    },
-
-    'notFoundHandler' => function () {
-            return new \Slim\Handlers\NotFound();
-    },
-
-    'notAllowedHandler' => function () {
-            return new \Slim\Handlers\NotAllowed();
-    },
+    'errorHandler' => DI\get('ErrorController'),
+    'notFoundHandler' => DI\get('NotFoundController'),
+    'notAllowedHandler' => DI\get('NotAllowedController'),
 
     'environment' => function () {
         return new \Slim\Http\Environment($_SERVER);
