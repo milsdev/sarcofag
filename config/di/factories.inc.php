@@ -26,7 +26,9 @@ return [
         return $renderer;
     },
 
-    'errorHandler' => DI\get('ErrorController'),
+    'errorHandler' => WP_DEBUG ? function (ContainerInterface $container) {
+                                    return new \Slim\Handlers\Error($container->get('settings')['displayErrorDetails']);
+                      } :  DI\get('ErrorController'),
     'notFoundHandler' => DI\get('NotFoundController'),
     'notAllowedHandler' => DI\get('NotAllowedController'),
 
