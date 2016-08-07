@@ -4,8 +4,8 @@ return [
         'abstract_factories' => [\Sarcofag\API\Zend\AbstractFactory::class]
     ],
 
-    'template.paths' => ['admin' => __DIR__ . '/../../src/admin/view',
-                         'theme' => __DIR__ . '/../../src/theme/view'],
+    'template.paths' => ['admin' => __DIR__ . '/../../src/Admin/view',
+                         'theme' => __DIR__ . '/../../src/Theme/view'],
     'ui.js.path.mapping' => [],
     'page.notfound' => 'theme/script/notfound.phtml',
     'page.notallowed' => 'theme/script/notallowed.phtml',
