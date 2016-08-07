@@ -6,7 +6,7 @@ use Sarcofag\SPI\EventManager\ListenerInterface;
 interface ActionInterface
 {
     /**
-     * @return ListenerInterface[]
+     * @return ListenerInterface[] | array
      */
     public function getActionListeners();
 }

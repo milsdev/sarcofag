@@ -48,6 +48,13 @@ class App implements ActionInterface
         $routeDispatcher = function () {
             $controllerPageMapping = $this->app->getContainer()->get(ControllerPageMappingField::class);
 
+            /**
+             * @FIXME: In future versions, need to change
+             * adding routes to the map of get|post. All WP PAGES and POSTS must
+             * coresponds to only GET method. Because it is has content only for reading.
+             * All other logic like writing or another logic should be implemented in WIDGETS
+             * or in controllers via declarring new routes and handlers for them.
+             */
             foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => 'page']) as $page) {
                 $controller = $controllerPageMapping->getValue($page->ID);
                 $this->app->map(['get', 'post'], parse_url(get_permalink($page), PHP_URL_PATH),

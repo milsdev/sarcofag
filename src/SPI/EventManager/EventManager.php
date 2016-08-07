@@ -1,6 +1,7 @@
 <?php
 namespace Sarcofag\SPI\EventManager;
 
+use DI\FactoryInterface;
 use Sarcofag\Exception\RuntimeException;
 use Sarcofag\API\WP;
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
@@ -14,13 +15,19 @@ class EventManager implements EventManagerInterface
     protected $wpService;
 
     /**
+     * @var FactoryInterface
+     */
+    protected $factory;
+
+    /**
      * ActionRegistrationService constructor.
      *
      * @param WP $wpService
      */
-    public function __construct(WP $wpService)
+    public function __construct(WP $wpService, FactoryInterface $factory)
     {
         $this->wpService = $wpService;
+        $this->factory = $factory;
     }
 
     /**
@@ -43,7 +50,7 @@ class EventManager implements EventManagerInterface
     }
 
     /**
-     * @param ListenerInterface[] $listeners
+     * @param ListenerInterface[] | array $listeners
      * @param string $type one of filter or action types
      */
     protected function register(array $listeners, $type)
@@ -54,6 +61,14 @@ class EventManager implements EventManagerInterface
         }
 
         foreach ($listeners as $listener) {
+            if (is_array($listener)) {
+                $listener = $this->factory->make('ActionListener', $listener);
+            }
+
+            if (!$listener instanceof ListenerInterface) {
+                throw new RuntimeException('Listener must be type of ListenerInterface');
+            }
+
             foreach ($listener->getNames() as $name) {
                 /**
                  * @see WP::add_action

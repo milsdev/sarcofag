@@ -6,7 +6,7 @@ use Sarcofag\SPI\EventManager\ListenerInterface;
 interface DataFilterInterface
 {
     /**
-     * @return ListenerInterface[]
+     * @return ListenerInterface[] | array
      */
     public function getDataFilterListeners();
 }

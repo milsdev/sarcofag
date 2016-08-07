@@ -1,8 +1,11 @@
 <?php
 namespace Sarcofag\API\WP;
 
-use DI\FactoryInterface;
+use DI\Container;
 use Sarcofag\Exception\RuntimeException;
+use Sarcofag\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\SPI\EventManager\DataFilter\DataFilterInterface;
+use Sarcofag\SPI\EventManager\EventManagerInterface;
 use Sarcofag\SPI\Widget\PersistableInterface;
 use Sarcofag\SPI\Widget\FiltrationInterface;
 use Sarcofag\SPI\Widget\WidgetInterface;
@@ -36,14 +39,24 @@ final class Widget extends \WP_Widget
      * Widget constructor.
      *
      * @param string $widgetClassNameOrAlias
-     * @param FactoryInterface $factory
+     * @param Container $container
      */
-    public function __construct($widgetClassNameOrAlias, FactoryInterface $factory)
+    public function __construct($widgetClassNameOrAlias,
+                                Container $container)
     {
-        $instance = $factory->make($widgetClassNameOrAlias, ['wpWidget'=>$this]);
+        $instance = $container->make($widgetClassNameOrAlias, ['wpWidget'=>$this]);
 
         if (!in_array(WidgetInterface::class, class_implements($instance))) {
             throw new RuntimeException("Incorrect widget class name or widget does not implement WidgetInterface");
+        }
+
+        /**
+         * Check if instance have listeners for wordpress
+         * events which should be registered while
+         * widget registering.
+         */
+        if ($instance instanceof ActionInterface || $instance instanceof DataFilterInterface) {
+            $container->get('EventManager')->attachListeners($instance);
         }
 
         $this->getInstance = function () use ($instance) {
