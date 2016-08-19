@@ -29,18 +29,30 @@ class LayoutHelper implements HelperInterface
      */
     public function invoke(array $arguments)
     {
+        $script = '';
+        $args = [];
+
         if (!empty($arguments[0])) {
             switch ($arguments[0]) {
                 case 'header':
-                    return $this->renderer->render('layout/header.phtml');
+                    $script = 'layout/header.phtml';
+                    break;
                 case 'footer':
-                    return $this->renderer->render('layout/footer.phtml');
+                    $script = 'layout/footer.phtml';
+                    break;
+                default:
+                    $script = 'layout/'.$arguments[0].'.phtml';
+                    break;
             }
         } else {
-            return $this->renderer->render('layout/'.$arguments[0].'.phtml');
+            throw new RuntimeException('First argument must be name of the layout, empty given .');
         }
 
-        return $this->renderer->render('layout/header.phtml');
+        if (!empty($arguments[1]) && is_array($arguments[1])) {
+            $args = $arguments[1];
+        }
+        
+        return $this->renderer->render($script, $args);
     }
 }
 
