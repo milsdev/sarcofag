@@ -23,5 +23,9 @@ return [
             'dbname' => DB_NAME,
             'host' => DB_HOST
         ]
-    ]
+    ],
+    'postTypes' => [
+        'post' => ['defaultController' => 'DefaultStaticPostController'],
+        'page' => ['defaultController' => 'DefaultStaticPageController']
+    ],
 ];

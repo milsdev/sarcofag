@@ -30,6 +30,7 @@ class App implements ActionInterface
      *
      * @param DI\FactoryInterface $factory
      * @param Slim\App $slimApp
+     * @param WP $wpService
      */
     public function __construct(DI\FactoryInterface $factory,
                                 Slim\App $slimApp,
@@ -46,30 +47,12 @@ class App implements ActionInterface
     public function getActionListeners()
     {
         $routeDispatcher = function () {
-            $controllerPageMapping = $this->app->getContainer()->get(ControllerPageMappingField::class);
+            $postTypeSettings = $this->app->getContainer()->get('postTypes');
 
-            /**
-             * @FIXME: In future versions, need to change
-             * adding routes to the map of get|post. All WP PAGES and POSTS must
-             * coresponds to only GET method. Because it is has content only for reading.
-             * All other logic like writing or another logic should be implemented in WIDGETS
-             * or in controllers via declarring new routes and handlers for them.
-             */
-            foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => 'page']) as $page) {
-                $controller = $controllerPageMapping->getValue($page->ID);
-                $this->app->map(['get', 'post'], parse_url(get_permalink($page), PHP_URL_PATH),
-                                $this->app->getContainer()
-                                     ->get(empty($controller) ? 'DefaultStaticPageController' : $controller))
-                     ->setArgument('requestedEntity', $page);
+            foreach ($postTypeSettings as $postType => $settings) {
+                $this->setRouteForPostTypes($postType, $settings['defaultController']);
             }
 
-            foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => 'post']) as $post) {
-                $controller = $controllerPageMapping->getValue($post->ID);
-                $this->app->map(['get', 'post'], parse_url(get_permalink($post), PHP_URL_PATH),
-                            $this->app->getContainer()
-                                 ->get(empty($controller) ? 'DefaultStaticPostController' : $controller))
-                     ->setArgument('requestedEntity', $post);
-            }
             $this->app->run();
         };
 
@@ -80,5 +63,25 @@ class App implements ActionInterface
                 'priority' => 99
             ])
         ];
+    }
+
+    protected function setRouteForPostTypes($postType, $defaultController)
+    {
+        $controllerPageMapping = $this->app->getContainer()->get(ControllerPageMappingField::class);
+
+        /**
+         * @FIXME: In future versions, need to change
+         * adding routes to the map of get|post. All WP PAGES and POSTS must
+         * coresponds to only GET method. Because it is has content only for reading.
+         * All other logic like writing or another logic should be implemented in WIDGETS
+         * or in controllers via declarring new routes and handlers for them.
+         */
+        foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => $postType]) as $post) {
+            $controller = $controllerPageMapping->getValue($post->ID);
+            $this->app->map(['get', 'post'], parse_url(get_permalink($post), PHP_URL_PATH),
+                $this->app->getContainer()
+                    ->get(empty($controller) ? $defaultController : $controller))
+                ->setArgument('requestedEntity', $post);
+        }
     }
 }
