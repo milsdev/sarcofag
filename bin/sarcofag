@@ -2,9 +2,9 @@
 <?php
 if (!empty($_SERVER['argc']) && $_SERVER['argc'] > 1 && $_SERVER['argv'][1] === 'install') {
     if (is_link(__DIR__ . "/../../index.php")) {
-        echo "Sarcofag already installed.";
+        echo "Sarcofag already installed." . PHP_EOL;
     } else {
-        echo "Installing sarcofag ....";
+        echo "Installing sarcofag ...." . PHP_EOL;
         symlink(__DIR__ . "/../index.php", __DIR__ . "/../../index.php");
     }
 }
