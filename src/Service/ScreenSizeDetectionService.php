@@ -55,7 +55,7 @@ class ScreenSizeDetectionService
      */
     public function isSmall()
     {
-        return $this->mobileDetectService->isMobile();
+        return $this->mobileDetectService->isMobile() && !$this->mobileDetectService->isTablet();
     }
 
     /**
