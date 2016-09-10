@@ -70,6 +70,18 @@ final class Widget extends \WP_Widget
                             $params->getOptions());
     }
 
+    /**
+     * FIXME: It is return not a real unique Widget ID
+     * it is return a widget registration name, which you
+     * declare in DI while registering your own widget.
+     * On example when you register widget you define my_widget_super_cool,
+     * it is NAME of the widget, which WP will use to generate unique id like
+     * my_widget_super_cool-1, so to get this id you will have to call PUBLIC
+     * PROPERTY ->id. So it is behaviour should be fixed, because it is
+     * really confusing.
+     *
+     * @return mixed
+     */
     public function getId()
     {
         $getInstance = $this->getInstance;

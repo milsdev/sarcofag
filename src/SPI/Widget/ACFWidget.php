@@ -48,11 +48,24 @@ class ACFWidget extends GenericWidget
      *
      * @return string
      */
-    public function render(array $placeholderParams = [], array $settings)
+    protected function renderAcfAwaredView(array $placeholderParams, array $settings)
     {
         return $this->renderer->render($this->params->getThemeTemplate(),
-            $placeholderParams + ['wpWidget' => $this->wpWidget,
-                                  'settings' => $settings,
-                                  'getField' => function ($name){return $this->getField($name);}]);
+                                       $placeholderParams + ['wpWidget' => $this->wpWidget,
+                                                             'settings' => $settings,
+                                                             'getField' => function ($name){
+                                                                               return $this->getField($name);
+                                                                           }]);
+    }
+
+    /**
+     * @param array $placeholderParams
+     * @param array $settings
+     *
+     * @return string
+     */
+    public function render(array $placeholderParams = [], array $settings)
+    {
+        return $this->renderAcfAwaredView($placeholderParams, $settings);
     }
 }
