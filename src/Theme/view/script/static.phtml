@@ -1,7 +1,5 @@
 <?=$this->layout('header')?>
 
-<?php requirePageJs( 'index' ) ?>
-
 <h1>Аз есмь СТАТИКА</h1>
 
 <div> <?=$this->wp->apply_filters('the_content', $staticEntry->post_content)?> </div>
