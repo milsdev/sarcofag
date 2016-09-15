@@ -28,7 +28,7 @@ class GenericWidgetParams implements RenderableInterface
     /**
      * @var array
      */
-    protected $widgetOptions;
+    protected $options;
 
     /**
      * @var RendererInterface

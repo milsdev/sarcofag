@@ -39,6 +39,11 @@ class SidebarEntry implements SidebarEntryInterface
     protected $afterWidget = "";
 
     /**
+     * @var array
+     */
+    protected $customFields = [];
+
+    /**
      * SidebarEntry constructor.
      *
      * @param string $id
@@ -48,12 +53,14 @@ class SidebarEntry implements SidebarEntryInterface
      * @param string $afterTitle
      * @param string $beforeWidget
      * @param string $afterWidget
+     * @param array $customFields
      */
     public function __construct($id, $name, $description = "",
                                 $beforeTitle = "",
                                 $afterTitle = "",
                                 $beforeWidget = "",
-                                $afterWidget = "")
+                                $afterWidget = "",
+                                $customFields = [])
     {
         $this->id = $id;
         $this->name = $name;
@@ -62,6 +69,7 @@ class SidebarEntry implements SidebarEntryInterface
         $this->afterTitle = $afterTitle;
         $this->beforeWidget = $beforeWidget;
         $this->afterWidget = $afterWidget;
+        $this->customFields = $customFields;
     }
 
     /**
@@ -73,27 +81,11 @@ class SidebarEntry implements SidebarEntryInterface
     }
 
     /**
-     * @param string $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return string
      */
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
     }
 
     /**
@@ -105,27 +97,11 @@ class SidebarEntry implements SidebarEntryInterface
     }
 
     /**
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
-
-    /**
      * @return string
      */
     public function getBeforeTitle()
     {
         return $this->beforeTitle;
-    }
-
-    /**
-     * @param string $beforeTitle
-     */
-    public function setBeforeTitle($beforeTitle)
-    {
-        $this->beforeTitle = $beforeTitle;
     }
 
     /**
@@ -137,27 +113,11 @@ class SidebarEntry implements SidebarEntryInterface
     }
 
     /**
-     * @param string $afterTitle
-     */
-    public function setAfterTitle($afterTitle)
-    {
-        $this->afterTitle = $afterTitle;
-    }
-
-    /**
      * @return string
      */
     public function getBeforeWidget()
     {
         return $this->beforeWidget;
-    }
-
-    /**
-     * @param string $beforeWidget
-     */
-    public function setBeforeWidget($beforeWidget)
-    {
-        $this->beforeWidget = $beforeWidget;
     }
 
     /**
@@ -169,10 +129,10 @@ class SidebarEntry implements SidebarEntryInterface
     }
 
     /**
-     * @param string $afterWidget
+     * @return array
      */
-    public function setAfterWidget($afterWidget)
+    public function getCustomFields()
     {
-        $this->afterWidget = $afterWidget;
+        return $this->customFields;
     }
 }

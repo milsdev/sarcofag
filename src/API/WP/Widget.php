@@ -6,6 +6,7 @@ use Sarcofag\Exception\RuntimeException;
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
 use Sarcofag\SPI\EventManager\DataFilter\DataFilterInterface;
 use Sarcofag\SPI\EventManager\EventManagerInterface;
+use Sarcofag\SPI\Widget\Params\ControlableInterface;
 use Sarcofag\SPI\Widget\PersistableInterface;
 use Sarcofag\SPI\Widget\FiltrationInterface;
 use Sarcofag\SPI\Widget\WidgetInterface;
@@ -65,9 +66,15 @@ final class Widget extends \WP_Widget
 
         $params = $instance->getParams();
 
+        $controlOption = [];
+        if ($params instanceof ControlableInterface) {
+            $controlOption = $params->getControlOptions();
+        }
+
         parent::__construct($params->getId(),
                             $params->getName(),
-                            $params->getOptions());
+                            $params->getOptions(),
+                            $controlOption);
     }
 
     /**

@@ -37,4 +37,9 @@ interface SidebarEntryInterface
      * @return string
      */
     public function getAfterWidget();
+
+    /**
+     * @return array
+     */
+    public function getCustomFields();
 }

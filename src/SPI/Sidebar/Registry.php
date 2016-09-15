@@ -76,8 +76,8 @@ class Registry implements ActionInterface
                     'before_widget' => $attachedItem->getBeforeWidget(),
                     'after_widget'  => $attachedItem->getAfterWidget(),
                 );
-    
-                $this->wpService->register_sidebar($args);
+
+                $this->wpService->register_sidebar($attachedItem->getCustomFields() + $args);
             }
         };
     
