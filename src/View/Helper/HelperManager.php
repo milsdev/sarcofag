@@ -35,11 +35,6 @@ class HelperManager implements HelperManagerInterface
      */
     public function addViewHelper($helperName, $viewHelperClassName, $helperArgs = [])
     {
-        if (!class_exists($viewHelperClassName) ||
-                !in_array(HelperInterface::class, class_implements($viewHelperClassName))) {
-            throw new RuntimeException("Incorrect helper class name or Helper do not implement HelperInterface");
-        }
-        
         $this->helpers[$helperName] = [$viewHelperClassName, $helperArgs];
     }
 
@@ -68,7 +63,7 @@ class HelperManager implements HelperManagerInterface
 
             return $this->helpers[ $name ];
         } else {
-            throw new \Exception("Could not found view helper for name ".$name);
+            throw new RuntimeException("Could not found view helper for name ".$name);
         }
     }
 
@@ -76,14 +71,14 @@ class HelperManager implements HelperManagerInterface
      * @param string $name
      *
      * @return HelperInterface
-     * @throws \Exception
+     * @throws RuntimeException
      */
     public function __get($name)
     {
         if (array_key_exists($name, $this->helpers)) {
             return $this->getHelper($name);
         } else {
-            throw new \Exception("Could not found view helper instance for name ".$name);
+            throw new RuntimeException("Could not found view helper instance for name ".$name);
         }
     }
 
@@ -92,14 +87,18 @@ class HelperManager implements HelperManagerInterface
      * @param array $arguments
      *
      * @return mixed
-     * @throws \Exception
+     * @throws RuntimeException
      */
     public function __call($name, array $arguments)
     {
         if (array_key_exists($name, $this->helpers)) {
+            if (!$this->getHelper($name) instanceof InvokableHelperInterface) {
+                throw new RuntimeException("Called helper do not implement InvokableHelperInterface");
+            }
+
             return $this->getHelper($name)->invoke($arguments);
         } else {
-            throw new \Exception("Could not found view helper for name ".$name);
+            throw new RuntimeException("Could not found view helper for name ".$name);
         }
     }
 }

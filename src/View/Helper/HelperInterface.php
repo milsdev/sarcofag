@@ -1,11 +1,10 @@
 <?php
 namespace Sarcofag\View\Helper;
 
-interface HelperInterface
-{
-    /**
-     * @param array $arguments
-     * @return bool | string
-     */
-    public function invoke(array $arguments);
-}
+/**
+ * @deprecated
+ * This interface required because a lot of projects already
+ * implements this interface, in future this interface will be
+ * removed
+ */
+interface HelperInterface extends InvokableHelperInterface {}
