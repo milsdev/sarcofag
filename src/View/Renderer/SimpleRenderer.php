@@ -9,7 +9,9 @@
 
 namespace Sarcofag\View\Renderer;
 
+use DI\FactoryInterface;
 use Sarcofag\API\WP;
+use Sarcofag\Utility\Closure;
 use Sarcofag\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use Sarcofag\View\Helper\HelperManagerInterface;
@@ -39,22 +41,30 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
      */
     protected $wp;
 
+    /**
+     * @var FactoryInterface
+     */
+    protected $factory;
+
 
     /**
      * SimpleRenderer constructor.
      *
      * @param HelperManagerInterface $helperManager   Container with all Helpers.
      * @param array                  $templaterConfig Array with the pathes to the template/view dirs.
+     * @param FactoryInterface       $factory         Factory service to create Closure instance.
      * @param WP                     $wp              Wordpress API object, to be able to call wordpress specific
      *                                                functions.
      */
     public function __construct(
         HelperManagerInterface $helperManager,
         array $templaterConfig,
+        FactoryInterface $factory,
         WP $wp
     ) {
         $this->templateConfig = $templaterConfig;
         $this->helperManager  = $helperManager;
+        $this->factory        = $factory;
         $this->wp             = $wp;
     }
 
@@ -82,7 +92,6 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
             array_unshift($parts, $extracted[0]);
         }
 
-
         $fullTemplatePath = rtrim($this->templateConfig[$alias], '/').'/'.join('/', $parts);
 
         if (!file_exists($fullTemplatePath)) {
@@ -109,11 +118,11 @@ class SimpleRenderer implements RendererInterface, PsrHttpRendererInterface
      */
     public function render($template, array $data = [])
     {
-        $render = \Closure::bind(
-            function ($template, $data) {
-                extract($data);
-                include $template;
-            },
+        $closure = $this->factory->make(Closure::class, ['closure'=>function ($template, $data) {
+            extract($data);
+            include $template;
+        }]);
+        $render = $closure->bindTo(
             $this->helperManager,
             get_class($this->helperManager)
         );
