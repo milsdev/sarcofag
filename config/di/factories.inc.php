@@ -21,7 +21,9 @@ return [
                             array_merge($container->get('template.paths'),
                                         [$themeEntity->get_template() => $themeDirectory]));
         
-        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('HelperManager'), $paths,
+        $renderer = new \Sarcofag\View\Renderer\SimpleRenderer($container->get('HelperManager'),
+                                                               $paths,
+                                                               $container,
                                                                $container->get('Sarcofag\API\WP'));
         return $renderer;
     },
