@@ -26,9 +26,9 @@ class Closure
     /**
      * Closure constructor.
      *
-     * @param \Closure $callable Closure object which will be called.
+     * @param \Closure $closure Closure object which will be called.
      */
-    public function __construct(\Closure $callable)
+    public function __construct(\Closure $closure)
     {
         $this->closure = $closure;
     }
