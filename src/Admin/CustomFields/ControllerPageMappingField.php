@@ -57,9 +57,12 @@ class ControllerPageMappingField extends CustomFieldAbstract implements ActionIn
     {
         return [
             $this->factory->make('ActionListener',
-                                   ['names' => ['manage_page_posts_custom_column',
+                                   ['names' => ['manage_posts_custom_column',
+                                                'manage_page_posts_custom_column',
                                                 'manage_post_posts_custom_column' ],
-                                    'callable' => function ($defaults) { return $this->showColumnsHead($defaults);},
+                                    'callable' => function ($column_name, $postId) {
+                                            return $this->showColumnsContent($column_name, $postId);
+                                    },
                                     'priority' => 10,
                                     'argc' => 2]),
 
@@ -83,7 +86,9 @@ class ControllerPageMappingField extends CustomFieldAbstract implements ActionIn
     {
         return [
             $this->factory->make('DataFilterListener',
-                                    ['names' => ['manage_page_posts_columns', 'manage_post_posts_columns', ],
+                                    ['names' => ['manage_posts_columns',
+                                                 'manage_page_posts_columns',
+                                                 'manage_post_posts_columns'],
                                      'callable' => function ($defaults) { return $this->showColumnsHead($defaults);},
                                      'priority' => 10]),
         ];

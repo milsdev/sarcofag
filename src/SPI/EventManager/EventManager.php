@@ -41,9 +41,13 @@ class EventManager implements EventManagerInterface
     {
         if ($listenersAggregate instanceOf ActionInterface) {
             $this->register($listenersAggregate->getActionListeners(), WP::EVENT_TYPE_ACTION);
-        } else if ($listenersAggregate instanceOf DataFilterInterface) {
+        }
+
+        if ($listenersAggregate instanceOf DataFilterInterface) {
             $this->register($listenersAggregate->getDataFilterListeners(), WP::EVENT_TYPE_FILTER);
-        } else {
+        }
+
+        if (!$listenersAggregate instanceof ActionInterface && !$listenersAggregate instanceof DataFilterInterface) {
             throw new RuntimeException('Incorect handler passed to register, 
                                             action must implement Filter or Actor Interface');
         }
