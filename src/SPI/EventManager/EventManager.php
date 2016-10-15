@@ -65,8 +65,10 @@ class EventManager implements EventManagerInterface
         }
 
         foreach ($listeners as $listener) {
-            if (is_array($listener)) {
+            if (is_array($listener) && $type == WP::EVENT_TYPE_ACTION) {
                 $listener = $this->factory->make('ActionListener', $listener);
+            } else if (is_array($listener) && $type == WP::EVENT_TYPE_FILTER) {
+                $listener = $this->factory->make('DataFilterListener', $listener);
             }
 
             if (!$listener instanceof ListenerInterface) {
