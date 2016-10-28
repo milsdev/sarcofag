@@ -2,7 +2,7 @@
 
 namespace SarcofagTest\Service\SPI\Widget;
 
-use Sarcofag\API\WP\Widget;
+use Sarcofag\API\WP\WidgetInterface;
 use Sarcofag\SPI\Widget\Params\RenderableInterface;
 use Sarcofag\View\Renderer\RendererInterface;
 
@@ -19,7 +19,7 @@ class GenericWidgetTest extends \PHPUnit_Framework_TestCase
     protected $renderer;
 
     /**
-     * @var Widget
+     * @var WidgetInterface
      */
     protected $wpWidget;
 
@@ -35,7 +35,7 @@ class GenericWidgetTest extends \PHPUnit_Framework_TestCase
         $this->params = $widgetParams;
         $this->renderer = $widgetParams->getRenderer();
 
-//        $this->wpWidget = $this->getMockBuilder(Widget::class);
+        $this->wpWidget = $this->getMockForAbstractClass(WidgetInterface::class);
     }
 
     /**
@@ -48,9 +48,23 @@ class GenericWidgetTest extends \PHPUnit_Framework_TestCase
      */
     public function testRender(array $placeholderParams = [], array $settings)
     {
-//        $this->renderer->render($this->params->getThemeTemplate(),
-//                                $placeholderParams + ['wpWidget' => $this->wpWidget,
-//                                                      'settings' => $settings]);
+        $array = $placeholderParams + ['wpWidget' => $this->wpWidget, 'settings' => $settings];
+
+        $this->params
+            ->expects($this->once())
+            ->method('getThemeTemplate')
+            ->willReturn('string');
+
+        $this->renderer
+            ->expects($this->once())
+            ->method('render')
+            ->with($this->equalTo('string'), $array);
+
+        $this->assertArraySubset(
+            ['wpWidget' => $this->getMockForAbstractClass(WidgetInterface::class),
+             'settings' => []], $array);
+
+        $this->renderer->render($this->params->getThemeTemplate(), $array);
     }
 
     public function rendererProvider()

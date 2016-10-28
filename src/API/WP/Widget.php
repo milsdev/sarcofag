@@ -9,7 +9,6 @@ use Sarcofag\SPI\EventManager\EventManagerInterface;
 use Sarcofag\SPI\Widget\Params\ControlableInterface;
 use Sarcofag\SPI\Widget\PersistableInterface;
 use Sarcofag\SPI\Widget\FiltrationInterface;
-use Sarcofag\SPI\Widget\WidgetInterface;
 use Sarcofag\View\Renderer\RendererInterface;
 
 /**
@@ -17,7 +16,7 @@ use Sarcofag\View\Renderer\RendererInterface;
  *
  * @package Sarcofag\API\WP
  */
-final class Widget extends \WP_Widget
+final class Widget extends \WP_Widget implements WidgetInterface
 {
     /**
      * @HACK
