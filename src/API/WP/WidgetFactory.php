@@ -7,7 +7,7 @@ use Sarcofag\API\WP;
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
 use Sarcofag\SPI\EventManager\ListenerInterface;
 
-final class WidgetFactory extends \WP_Widget_Factory implements ActionInterface
+final class WidgetFactory extends \WP_Widget_Factory implements WidgetFactoryInterface
 {
     /**
      * @var FactoryInterface
