@@ -2,10 +2,12 @@
 
 namespace SarcofagTest\Service\SPI\Widget;
 
-use Sarcofag\API\ACF\ACFField;
 use Sarcofag\API\WP;
-use Sarcofag\API\WP\Widget as WPWidget;
+use Sarcofag\API\ACF\ACFField;
+use Sarcofag\API\WP\WidgetInterface as WpWidgetInterface;
 use Sarcofag\Filter\WidgetIdFilter;
+use Sarcofag\SPI\Widget\Params\RenderableInterface;
+use Sarcofag\View\Renderer\RendererInterface;
 
 class ACFWidgetTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +16,20 @@ class ACFWidgetTest extends \PHPUnit_Framework_TestCase
      */
     protected $acfField;
 
+    /**
+     * @var WP\WidgetInterface
+     */
     protected $wpWidget;
+
+    /**
+     * @var RendererInterface
+     */
+    protected $renderer;
+
+    /**
+     * @var RenderableInterface
+     */
+    protected $params;
 
     public function setUp()
     {
@@ -26,28 +41,61 @@ class ACFWidgetTest extends \PHPUnit_Framework_TestCase
                                ->getMock();
 
         $this->acfField->method('getWidgetField')->willReturn('String');
+        $this->wpWidget = $this->getMockForAbstractClass(WpWidgetInterface::class);
 
-//        $this->wpWidget = $this->getMockBuilder(WPWidget::class)->getMock();
+        /** @var RenderableInterface $widgetParams */
+        $widgetParams = $this->getMockForAbstractClass(RenderableInterface::class);
+
+        $widgetParams->method('getRenderer')->willReturn(
+            $this->getMockForAbstractClass(RendererInterface::class)
+        );
+
+        $this->params = $widgetParams;
+        $this->renderer = $widgetParams->getRenderer();
+
+    }
+
+    protected function getField($name)
+    {
+        return 'string';
     }
 
     /**
-     * @param String $name
-     *
-     * @dataProvider nameProvider
-     *
-     * @return mixed
+     * @param array $placeholderParams
+     * @param array $settings
      */
-    public function testGetField($name)
+    protected function renderAcfAwaredView(array $placeholderParams = [], array $settings)
     {
-        $this->assertStringMatchesFormat('%s', $name);
-        $this->assertStringMatchesFormat('%s', $this->acfField->getWidgetField($name, 'mils_header_sidebar'));
+        $callable = function ($name) {
+            return $this->getField($name);
+        };
+
+        $array = $placeholderParams + ['wpWidget' => $this->wpWidget, 'settings' => $settings, 'getField' => $callable];
+
+        $this->params
+            ->expects($this->once())
+            ->method('getThemeTemplate')
+            ->willReturn('string');
+
+        $this->renderer
+            ->expects($this->once())
+            ->method('render')
+            ->with($this->equalTo('string'), $array);
+
+        $this->assertArraySubset(
+            [
+                'wpWidget' => $this->getMockForAbstractClass(WpWidgetInterface::class),
+                'settings' => [],
+                'getField' => $callable
+            ], $array);
+
+        $this->renderer->render($this->params->getThemeTemplate(), $placeholderParams + $array);
     }
 
-    public function nameProvider()
+    public function rendererProvider()
     {
         return [
-            ['title'],
-            ['description']
+            [[], []]
         ];
     }
 
@@ -57,22 +105,8 @@ class ACFWidgetTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider rendererProvider
      */
-    public function testRender(array $placeholderParams = [], array $settings)
+    public function testRender(array $placeholderParams, array $settings)
     {
-//        return $this->renderer->render($this->params->getThemeTemplate(),
-//            $placeholderParams +
-//            ['wpWidget' => $this->wpWidget,
-//                'settings' => $settings,
-//                'getField' => function ($name) {
-//                    return $this->getField($name);
-//                }
-//            ]);
-    }
-
-    public function rendererProvider()
-    {
-        return [
-            [[], []]
-        ];
+        $this->renderAcfAwaredView($placeholderParams, $settings);
     }
 }
