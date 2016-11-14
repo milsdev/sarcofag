@@ -20,14 +20,22 @@ class EventManager implements EventManagerInterface
     protected $factory;
 
     /**
+     * @var ListenerFactory
+     */
+    protected $listenerFactory;
+
+    /**
      * ActionRegistrationService constructor.
      *
      * @param WP $wpService
      */
-    public function __construct(WP $wpService, FactoryInterface $factory)
+    public function __construct(WP $wpService,
+                                FactoryInterface $factory,
+                                ListenerFactory $listenerFactory)
     {
         $this->wpService = $wpService;
         $this->factory = $factory;
+        $this->listenerFactory = $listenerFactory;
     }
 
     /**
@@ -59,21 +67,9 @@ class EventManager implements EventManagerInterface
      */
     protected function register(array $listeners, $type)
     {
-        if (!in_array($type, [WP::EVENT_TYPE_FILTER, WP::EVENT_TYPE_ACTION])) {
-            throw new RuntimeException
-                            ('Unsupported type of the event ['.$type.'], now supports only filter or action types');
-        }
-
         foreach ($listeners as $listener) {
-            if (is_array($listener) && $type == WP::EVENT_TYPE_ACTION) {
-                $listener = $this->factory->make('ActionListener', $listener);
-            } else if (is_array($listener) && $type == WP::EVENT_TYPE_FILTER) {
-                $listener = $this->factory->make('DataFilterListener', $listener);
-            }
-
-            if (!$listener instanceof ListenerInterface) {
-                throw new RuntimeException('Listener must be type of ListenerInterface');
-            }
+            $listener = $this->listenerFactory
+                                ->makeListener($type, $listener);
 
             foreach ($listener->getNames() as $name) {
                 /**
