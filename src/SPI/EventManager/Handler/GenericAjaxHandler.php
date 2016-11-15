@@ -50,13 +50,22 @@ class GenericAjaxHandler implements HandlerInterface
     public function __invoke()
     {
         $response = $this->factory->make(Response::class);
-        $request = Request::createFromEnvironment(
-            $this->factory
-                 ->make(Environment::class, ['items' => ($_SERVER + $_REQUEST)]));
-
+        $request = Request::createFromEnvironment($this->factory
+                                                       ->make(Environment::class,
+                                                                ['items' => ($_SERVER + $_REQUEST)]));
         $callable = $this->callable;
-
         $result = $callable($request, $response);
-        $this->wpService->wp_send_json($result);
+        if (!$result instanceof MessageInterface) {
+            echo $result;
+        } else {
+            foreach ($result->getHeaders() as $name=>$headers) {
+                foreach ($headers as $header) {
+                    @header($name . ': ' . $header);
+                }
+            }
+            echo (string)$result->getBody();
+        }
+
+        $this->wpService->wp_die();
     }
 }
