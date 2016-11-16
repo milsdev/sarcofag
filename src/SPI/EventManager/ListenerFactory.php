@@ -41,7 +41,7 @@ class ListenerFactory
             if (array_key_exists('ajax', $listener) && $listener['ajax'] === true) {
                 if (array_key_exists('callable', $listener) &&
                         !($listener['callable'] instanceof HandlerInterface)) {
-                    $listener['handler'] = $this->factory
+                    $listener['callable'] = $this->factory
                                                 ->make(GenericAjaxHandler::class,
                                                         ['callable' => $listener['callable']]);
                 }

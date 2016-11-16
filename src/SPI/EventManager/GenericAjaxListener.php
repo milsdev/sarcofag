@@ -2,7 +2,6 @@
 namespace Sarcofag\SPI\EventManager;
 
 use Sarcofag\SPI\EventManager\Handler\HandlerInterface;
-use Sarcofag\SPI\EventManager\Strategy\CallableInterface;
 
 class GenericAjaxListener implements ListenerInterface
 {
@@ -53,20 +52,20 @@ class GenericAjaxListener implements ListenerInterface
      * GenericAjaxListener constructor.
      *
      * @param string | array $names
-     * @param HandlerInterface $handler
+     * @param HandlerInterface $callable
      * @param bool $enableForAuthorizedUsers
      * @param bool $enableForNotAuthorizedUsers
      * @param null $priority
      * @param int $argc
      */
     public function __construct($names,
-                                HandlerInterface $handler,
+                                HandlerInterface $callable,
                                 $enableForAuthorizedUsers = true,
                                 $enableForNotAuthorizedUsers = true,
                                 $priority = null,
                                 $argc = 1)
     {
-        $this->handler = $handler;
+        $this->handler = $callable;
         $this->names = $names;
         $this->enableForAuthorizedUsers = $enableForAuthorizedUsers;
         $this->enableForNotAuthorizedUsers = $enableForNotAuthorizedUsers;
