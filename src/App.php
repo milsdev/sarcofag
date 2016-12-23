@@ -3,6 +3,7 @@ namespace Sarcofag;
 
 use DI;
 use Sarcofag\API\WP;
+use Sarcofag\SPI\Routing\PostFilterInterface;
 use Slim;
 use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
@@ -26,19 +27,27 @@ class App implements ActionInterface
     protected $wpService;
 
     /**
+     * @var PostFilterInterface
+     */
+    protected $postFilter;
+
+    /**
      * App constructor.
      *
      * @param DI\FactoryInterface $factory
      * @param Slim\App $slimApp
      * @param WP $wpService
+     * @param PostFilterInterface $postFilter
      */
     public function __construct(DI\FactoryInterface $factory,
                                 Slim\App $slimApp,
-                                WP $wpService)
+                                WP $wpService,
+                                PostFilterInterface $postFilter)
     {
         $this->factory = $factory;
         $this->app = $slimApp;
         $this->wpService = $wpService;
+        $this->postFilter = $postFilter;
     }
 
     /**
@@ -78,6 +87,9 @@ class App implements ActionInterface
          */
         foreach ($this->wpService->get_posts(['numberposts' => -1, 'post_type' => $postType]) as $post) {
             $controller = $controllerPageMapping->getValue($post->ID);
+
+            if (! $this->postFilter->filter($post)) continue;
+
             $this->app->map(['get', 'post'], parse_url(get_permalink($post), PHP_URL_PATH),
                 $this->app->getContainer()
                     ->get(empty($controller) ? $defaultController : $controller))
