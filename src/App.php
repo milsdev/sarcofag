@@ -2,17 +2,14 @@
 namespace Sarcofag;
 
 use DI;
-use Sarcofag\API\WP;
-use Sarcofag\Proxy\PostObjectProxy;
 use Slim;
-use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
-use Sarcofag\SPI\EventManager\Action\ActionInterface;
-use Sarcofag\SPI\EventManager\ListenerInterface;
-use Zend\Cache\PatternFactory;
-use Zend\Cache\Storage\Adapter\Apc;
-use Zend\Cache\Storage\Adapter\Memcache;
-use Zend\Cache\Storage\Adapter\Memcached;
+use Sarcofag\API\WP;
 use Zend\Cache\StorageFactory;
+use Sarcofag\Proxy\PostObjectProxy;
+use Sarcofag\SPI\Routing\PostFilterInterface;
+use Sarcofag\SPI\EventManager\ListenerInterface;
+use Sarcofag\SPI\EventManager\Action\ActionInterface;
+use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
 
 class App implements ActionInterface
 {
@@ -53,20 +50,28 @@ class App implements ActionInterface
     protected $settings;
 
     /**
+     * @var PostFilterInterface
+     */
+    protected $postFilter;
+
+    /**
      * App constructor.
      *
      * @param DI\FactoryInterface $factory
      * @param Slim\App $slimApp
      * @param WP $wpService
+     * @param PostFilterInterface $postFilter
      */
     public function __construct(DI\FactoryInterface $factory,
                                 Slim\App $slimApp,
-                                WP $wpService)
+                                WP $wpService,
+                                PostFilterInterface $postFilter)
     {
         $this->factory = $factory;
         $this->app = $slimApp;
         $this->wpService = $wpService;
         $this->settings = $slimApp->getContainer()->get('settings');
+        $this->postFilter = $postFilter;
     }
 
 
@@ -119,14 +124,19 @@ class App implements ActionInterface
         foreach ($postTypeSettings as $postType=>$postTypeOptions) {
             // Getting all entries, it is mixed posts and pages, and
             // every post type which were defined in postTypes in settings.inc.php
-            // but only from list of supported types (https://codex.wordpress.org/Class_Reference/WP_Query#Type_Parameters)
-            $entries = $this->wpService->get_posts(['numberposts' => -1, 'post_type' => $postType]);
+            // but only from list of supported types
+            // (https://codex.wordpress.org/Class_Reference/WP_Query#Type_Parameters)
+            $entries = $this->wpService->get_posts(['numberposts' => - 1, 'post_type' => $postType]);
 
             // Fetching default controller to be able to use it if
             // any controller were mentioned while POST were created
             $defaultController = $postTypeOptions['defaultController'];
 
             $controllerPageMapping = $this->app->getContainer()->get(ControllerPageMappingField::class);
+
+            // Run filter to remove posts from the
+            // queue to be registered as a routes.
+            $entries = array_filter($entries, [$this->postFilter, 'filter']);
 
             // Extract from full post data only required for the
             // route building params. Merge all the entries of all the types.
@@ -136,13 +146,15 @@ class App implements ActionInterface
                             // Get a field from post where defined which controller class
                             // should be associated with current POST/PAGE
                             $controller = $controllerPageMapping->getValue($post->ID);
-                            return ['id' => $post->ID,
-                                    'url' => parse_url($this->wpService->get_permalink($post),
-                                                        PHP_URL_PATH),
-                                    'controller'=> empty($controller) ?
-                                                        $defaultController :
-                                                        $controller];
-            }, $entries));
+                            return [
+                                'id'         => $post->ID,
+                                'url'        => parse_url($this->wpService->get_permalink($post),
+                                                            PHP_URL_PATH),
+                                'controller' => empty($controller) ?
+                                                    $defaultController :
+                                                        $controller
+                            ];
+                        }, $entries));
         }
 
         if ($cache !== false) {
