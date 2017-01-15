@@ -10,8 +10,5 @@ return [
         DI\get('HelperManager'),
 
     \Sarcofag\SPI\EventManager\EventManagerInterface::class =>
-        DI\get('EventManager'),
-
-    \Sarcofag\SPI\Routing\PostFilterInterface::class =>
-        DI\get(\Sarcofag\SPI\Routing\PostFilter::class)
+        DI\get('EventManager')
 ];

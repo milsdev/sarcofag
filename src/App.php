@@ -4,12 +4,16 @@ namespace Sarcofag;
 use DI;
 use Slim;
 use Sarcofag\API\WP;
+use Zend\Cache\PatternFactory;
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Cache\StorageFactory;
 use Sarcofag\Proxy\PostObjectProxy;
-use Sarcofag\SPI\Routing\PostFilterInterface;
+use Sarcofag\Entity\RoutePostEntityInterface;
 use Sarcofag\SPI\EventManager\ListenerInterface;
+use Sarcofag\SPI\Factory\RoutePostEntityFactory;
+use Sarcofag\SPI\Routing\RoutePostFilterInterface;
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
-use Sarcofag\Admin\CustomFields\ControllerPageMappingField;
+use Sarcofag\SPI\Factory\RoutePostEntityFactoryInterface;
 
 class App implements ActionInterface
 {
@@ -50,31 +54,51 @@ class App implements ActionInterface
     protected $settings;
 
     /**
-     * @var PostFilterInterface
+     * Filters collection to filtering routes
+     * by rules defined inside the filters logic.
+     *
+     * @var RoutePostFilterInterface
      */
-    protected $postFilter;
+    protected $routePostEntityFilter;
+
+    /**
+     * Factory to create a RoutePostEntity
+     * instances using the data fetched from
+     * WP_Post.
+     *
+     * @var RoutePostEntityFactory
+     */
+    protected $routePostEntityFactory;
+
+    /**
+     * @var StorageInterface | null
+     */
+    protected $cache = null;
 
     /**
      * App constructor.
      *
+     * @param array $settings
      * @param DI\FactoryInterface $factory
      * @param Slim\App $slimApp
      * @param WP $wpService
-     * @param PostFilterInterface $postFilter
+     * @param RoutePostEntityFactoryInterface $routePostEntityFactory
+     * @param RoutePostFilterInterface $routePostEntityFilter
      */
-    public function __construct(DI\FactoryInterface $factory,
+    public function __construct(array $settings,
+                                DI\FactoryInterface $factory,
                                 Slim\App $slimApp,
                                 WP $wpService,
-                                PostFilterInterface $postFilter)
+                                RoutePostEntityFactoryInterface $routePostEntityFactory,
+                                RoutePostFilterInterface $routePostEntityFilter)
     {
-        $this->factory = $factory;
         $this->app = $slimApp;
+        $this->factory = $factory;
+        $this->settings = $settings;
         $this->wpService = $wpService;
-        $this->settings = $slimApp->getContainer()->get('settings');
-        $this->postFilter = $postFilter;
+        $this->routePostEntityFilter = $routePostEntityFilter;
+        $this->routePostEntityFactory = $routePostEntityFactory;
     }
-
-
 
     /**
      * @return ListenerInterface[]
@@ -91,17 +115,11 @@ class App implements ActionInterface
     }
 
     /**
-     * Initialize cache, the common cache manager
-     * will be used to store all data which might
-     * be cached.
+     * @param StorageInterface $storage [OPTIONAL]
      */
-    protected function initCache()
+    public function setCache(StorageInterface $storage = null)
     {
-        if (!array_key_exists('cache', $this->settings)) {
-            return false; // Cache is not exists in configuration
-        }
-
-        return StorageFactory::factory($this->settings['cache']);
+        $this->cache = $storage;
     }
 
     /**
@@ -109,16 +127,17 @@ class App implements ActionInterface
      * post types, to have a route builtin and
      * configured in Slim/App to become navigable.
      *
-     * @return array
+     * @return RoutePostEntityInterface[]
      */
     protected function getAllEntriesToBuildRoutes()
     {
-        $cache = $this->initCache();
-        if ($cache !== false && $cache->hasItem($this->cacheKeyForRoutes)) {
-            return $cache->getItem($this->cacheKeyForRoutes); // array
+        if ($this->cache !== null && $this->cache->hasItem($this->cacheKeyForRoutes)) {
+            $items = $this->cache->getItem($this->cacheKeyForRoutes); // array
+            return $items;
         }
 
         $items = [];
+        
         $postTypeSettings = $this->app->getContainer()->get('postTypes');
 
         foreach ($postTypeSettings as $postType=>$postTypeOptions) {
@@ -126,39 +145,24 @@ class App implements ActionInterface
             // every post type which were defined in postTypes in settings.inc.php
             // but only from list of supported types
             // (https://codex.wordpress.org/Class_Reference/WP_Query#Type_Parameters)
-            $entries = $this->wpService->get_posts(['numberposts' => - 1, 'post_type' => $postType]);
-
-            // Fetching default controller to be able to use it if
-            // any controller were mentioned while POST were created
-            $defaultController = $postTypeOptions['defaultController'];
-
-            $controllerPageMapping = $this->app->getContainer()->get(ControllerPageMappingField::class);
-
-            // Run filter to remove posts from the
-            // queue to be registered as a routes.
-            $entries = array_filter($entries, [$this->postFilter, 'filter']);
+            $entries = $this->wpService->get_posts(['numberposts' => - 1,
+                                                    'post_type' => $postType]);
 
             // Extract from full post data only required for the
             // route building params. Merge all the entries of all the types.
             // And this params will be cached if cache enabled.
             $items = array_merge($items,
-                        array_map(function ($post) use ($controllerPageMapping, $defaultController) {
-                            // Get a field from post where defined which controller class
-                            // should be associated with current POST/PAGE
-                            $controller = $controllerPageMapping->getValue($post->ID);
-                            return [
-                                'id'         => $post->ID,
-                                'url'        => parse_url($this->wpService->get_permalink($post),
-                                                            PHP_URL_PATH),
-                                'controller' => empty($controller) ?
-                                                    $defaultController :
-                                                        $controller
-                            ];
+                        array_map(function ($post) {
+                            // Create a RoutePostEntityInterface object
+                            // to use it while registering Routes in Slim/App
+                            $entity = $this->routePostEntityFactory
+                                           ->create($post->to_array());
+                            return $entity;
                         }, $entries));
         }
 
-        if ($cache !== false) {
-            $cache->setItem($this->cacheKeyForRoutes, $items);
+        if ($this->cache !== null) {
+            $this->cache->setItem($this->cacheKeyForRoutes, $items);
         }
         return $items;
     }
@@ -170,15 +174,23 @@ class App implements ActionInterface
     protected function routeDispatcher()
     {
         $container = $this->app->getContainer();
-        foreach ($this->getAllEntriesToBuildRoutes() as $route) {
-            $this->app->map(['get', 'post'], $route['url'], $container->get($route['controller']))
+        foreach ($this->getAllEntriesToBuildRoutes() as $routePostEntity) {
+
+            // Run filter to remove posts from the
+            // queue to be registered as a routes.
+            if (!$this->routePostEntityFilter->filter($routePostEntity)) continue;
+
+            $this->app->map(['get', 'post'], $routePostEntity->getUrl(),
+                                $container->get($routePostEntity->getController()))
                       ->setArgument('requestedEntity',
                                         // Create a dummy proxy for the
                                         // WP_Post object. And pass this proxy to all
                                         // routes
-                                        new PostObjectProxy($route['id'], $this->wpService));
+                                        new PostObjectProxy($routePostEntity->getId(),
+                                                            $this->wpService));
         }
-
+        
+        
         $this->app->run();
     }
 }

@@ -13,19 +13,40 @@ $loader = include ABSPATH . '/vendor/autoload.php';
 $loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
 
 $containerBuilder = new DI\ContainerBuilder();
-$containerBuilder->addDefinitions(__DIR__ . '/config/di.inc.php');
 
-$activePlugins = get_option('active_plugins');
-foreach ($activePlugins as $activePlugin) {
-    $pluginDiConfig = WP_PLUGIN_DIR . '/' . trim(dirname($activePlugin), '/') . '/config/di.inc.php';
-    if (!file_exists($pluginDiConfig)) continue;
-    $containerBuilder->addDefinitions(require $pluginDiConfig);
+$cacheStorage = null;
+if (defined("SARCOFAG_CACHE_PARAMS")) {
+    $cacheStorage = \Zend\Cache\StorageFactory::factory(SARCOFAG_CACHE_PARAMS);
 }
 
-if (file_exists(get_template_directory() . '/src/config/di.inc.php')) {
-    $containerBuilder->addDefinitions(require get_template_directory() . '/src/config/di.inc.php');
+$containerBuilder->addDefinitions(['DefaultCacheStorage' => $cacheStorage]);
+
+if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
+    $definitions = $cacheStorage->getItem('diDefinitions');
+} else {
+    $definitions = [new \DI\Definition\Source\DefinitionFile(__DIR__ . '/config/di.inc.php')];
+
+    $activePlugins = get_option('active_plugins');
+    foreach ($activePlugins as $activePlugin) {
+        $pluginDiConfig = WP_PLUGIN_DIR . '/' . trim(dirname($activePlugin), '/') . '/config/di.inc.php';
+        if (!file_exists($pluginDiConfig)) {
+            continue;
+        }
+        $definitions[] = new \DI\Definition\Source\DefinitionFile($pluginDiConfig);
+    }
+
+    if (file_exists(get_template_directory() . '/src/config/di.inc.php')) {
+        $definitions[] =
+            new \DI\Definition\Source\DefinitionFile(get_template_directory() .
+                                                        '/src/config/di.inc.php');
+    }
+
+    if (!is_null($cacheStorage)) {
+        $cacheStorage->setItem('diDefinitions', $definitions);
+    }
 }
 
+array_map([$containerBuilder, 'addDefinitions'], $definitions);
 $di = $containerBuilder->build();
 
 foreach ($di->get('autoloader.paths') as $namespace => $autoloaderPaths) {

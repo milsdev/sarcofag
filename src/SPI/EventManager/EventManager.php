@@ -25,9 +25,11 @@ class EventManager implements EventManagerInterface
     protected $listenerFactory;
 
     /**
-     * ActionRegistrationService constructor.
+     * EventManager constructor.
      *
      * @param WP $wpService
+     * @param FactoryInterface $factory
+     * @param ListenerFactory $listenerFactory
      */
     public function __construct(WP $wpService,
                                 FactoryInterface $factory,
@@ -55,8 +57,9 @@ class EventManager implements EventManagerInterface
             $this->register($listenersAggregate->getDataFilterListeners(), WP::EVENT_TYPE_FILTER);
         }
 
-        if (!$listenersAggregate instanceof ActionInterface && !$listenersAggregate instanceof DataFilterInterface) {
-            throw new RuntimeException('Incorect handler passed to register, 
+        if (!$listenersAggregate instanceof ActionInterface &&
+            !$listenersAggregate instanceof DataFilterInterface) {
+            throw new RuntimeException('Incorrect handler passed to register, 
                                             action must implement Filter or Actor Interface');
         }
     }
