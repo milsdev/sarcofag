@@ -70,10 +70,7 @@ class App implements ActionInterface
      */
     protected $routePostEntityFactory;
 
-    /**
-     * @var StorageInterface | null
-     */
-    protected $cache = null;
+
 
     /**
      * App constructor.
@@ -108,14 +105,16 @@ class App implements ActionInterface
         return [
             $this->factory->make('ActionListener', [
                 'names' => 'template_include',
-                'callable' => function () { return $this->routeDispatcher(); },
+                'callable' => function () {
+                    return $this->routeDispatcher();
+                },
                 'priority' => 99
             ])
         ];
     }
 
     /**
-     * @param StorageInterface $storage [OPTIONAL]
+     * @param StorageInterface $storage [OPTIONAL
      */
     public function setCache(StorageInterface $storage = null)
     {
@@ -174,23 +173,26 @@ class App implements ActionInterface
     protected function routeDispatcher()
     {
         $container = $this->app->getContainer();
+        $wpService = $this->wpService;
         foreach ($this->getAllEntriesToBuildRoutes() as $routePostEntity) {
 
             // Run filter to remove posts from the
             // queue to be registered as a routes.
             if (!$this->routePostEntityFilter->filter($routePostEntity)) continue;
 
-            $this->app->map(['get', 'post'], $routePostEntity->getUrl(),
-                                $container->get($routePostEntity->getController()))
-                      ->setArgument('requestedEntity',
-                                        // Create a dummy proxy for the
-                                        // WP_Post object. And pass this proxy to all
-                                        // routes
-                                        new PostObjectProxy($routePostEntity->getId(),
-                                                            $this->wpService));
+            $this->app->map(['get', 'post'], $routePostEntity->getUrl(), 
+                            function ($request, $response, $args)
+                                use ($container, $routePostEntity, $wpService) {
+                $invokableController = $container->get($routePostEntity->getController());
+                return $invokableController($request, $response,
+                                            array_merge($args,
+                                                        ['requestedEntity'=>
+                                                             $wpService
+                                                                 ->get_post($routePostEntity->getId())]));
+            });
         }
-        
-        
         $this->app->run();
     }
+    
+    
 }
