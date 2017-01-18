@@ -70,7 +70,13 @@ class App implements ActionInterface
      */
     protected $routePostEntityFactory;
 
-
+    /**
+     * Optional cache storage. Will
+     * be used to cache routes to the storage.
+     *
+     * @var StorageInterface | null
+     */
+    protected $cache = null;
 
     /**
      * App constructor.
