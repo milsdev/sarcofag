@@ -21,6 +21,9 @@ return [
                                                               DI\get('RoutePostEntityFilter'))
                                       ->method('setCache', DI\get('DefaultCacheStorage')),
 
+    \Sarcofag\Cache\CacheHandler::class => DI\object()->constructorParameter('routePostEntityFactory',
+                                                                             DI\get('RoutePostEntityFactory')),
+
     'ValidatorChain' => DI\object(\Zend\Validator\ValidatorChain::class)
                            ->method('setPluginManager',
                                     DI\object(\Zend\Validator\ValidatorPluginManager::class)

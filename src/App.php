@@ -2,6 +2,7 @@
 namespace Sarcofag;
 
 use DI;
+use Sarcofag\Cache\CacheHandler;
 use Slim;
 use Sarcofag\API\WP;
 use Zend\Cache\PatternFactory;
@@ -70,6 +71,7 @@ class App implements ActionInterface
      */
     protected $routePostEntityFactory;
 
+    protected $cacheHandler;
 
 
     /**
@@ -81,11 +83,13 @@ class App implements ActionInterface
      * @param WP $wpService
      * @param RoutePostEntityFactoryInterface $routePostEntityFactory
      * @param RoutePostFilterInterface $routePostEntityFilter
+     * @param CacheHandler $cacheHandler
      */
     public function __construct(array $settings,
                                 DI\FactoryInterface $factory,
                                 Slim\App $slimApp,
                                 WP $wpService,
+                                CacheHandler $cacheHandler,
                                 RoutePostEntityFactoryInterface $routePostEntityFactory,
                                 RoutePostFilterInterface $routePostEntityFilter)
     {
@@ -95,6 +99,7 @@ class App implements ActionInterface
         $this->wpService = $wpService;
         $this->routePostEntityFilter = $routePostEntityFilter;
         $this->routePostEntityFactory = $routePostEntityFactory;
+        $this->cacheHandler = $cacheHandler;
     }
 
     /**
@@ -102,7 +107,7 @@ class App implements ActionInterface
      */
     public function getActionListeners()
     {
-        return [
+        $listeners = [
             $this->factory->make('ActionListener', [
                 'names' => 'template_include',
                 'callable' => function () {
@@ -111,6 +116,36 @@ class App implements ActionInterface
                 'priority' => 99
             ])
         ];
+
+        if ($this->cache !== null) {
+            $listeners[] = $this->factory->make('ActionListener', [
+                'names' => ['publish_post'],
+                'callable' => function($postId, $post) {
+                    $this->cacheHandler->publishPost($postId, $post);
+                },
+                'priority' => 10,
+                'argc' => 2
+            ]);
+
+            $listeners[] = $this->factory->make('ActionListener', [
+                'names' => ['post_updated'],
+                'callable' => function($postId, $postAfter, $postBefore) {
+                    $this->cacheHandler->updatePost($postId, $postAfter, $postBefore);
+                },
+                'priority' => 10,
+                'argc' => 3
+            ]);
+
+            $listeners[] = $this->factory->make('ActionListener', [
+                'names' => ['delete_post'],
+                'callable' => function($postId) {
+                    $this->cacheHandler->deletePost($postId);
+                },
+                'priority' => 10,
+            ]);
+        }
+
+        return $listeners;
     }
 
     /**
