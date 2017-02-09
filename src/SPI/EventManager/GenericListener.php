@@ -57,20 +57,6 @@ class GenericListener implements ListenerInterface
     }
 
     /**
-     * It is basic action to register in
-     * wordpress.
-     *
-     * @param array $arguments [OPTIONAL]
-     *
-     * @return void
-     */
-    public function __invoke($arguments = [])
-    {
-        $callable = $this->callable;
-        $callable($arguments);
-    }
-
-    /**
      * @return string[]
      */
     public function getNames()

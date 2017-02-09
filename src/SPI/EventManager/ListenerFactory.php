@@ -36,7 +36,6 @@ class ListenerFactory
                         ('Unsupported type of the event [' . $type . '], now supports only filter or action types');
         }
 
-        $listenerHandler = '';
         if (is_array($listener) && $type == WP::EVENT_TYPE_ACTION) {
             if (array_key_exists('ajax', $listener) && $listener['ajax'] === true) {
                 if (array_key_exists('callable', $listener) &&
@@ -52,6 +51,8 @@ class ListenerFactory
             }
         } else if (is_array($listener) && $type == WP::EVENT_TYPE_FILTER) {
             $listener = $this->factory->make('DataFilterListener', $listener);
+        } else if (is_string($listener)) {
+            $listener = $this->factory->make($listener);
         }
 
         if (!$listener instanceof ListenerInterface) {
