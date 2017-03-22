@@ -39,7 +39,7 @@ return [
                                             ->method('setDefaultValidatorChain', DI\get('ValidatorChain'))
                             ->scope(\DI\Scope::PROTOTYPE),
 
-    'NotFoundController' => DI\object(Sarcofag\Theme\Controller\SimpleRendererController::class)
+    'NotFoundController' => DI\object(Sarcofag\Theme\Controller\SimpleNotFoundController::class)
         ->constructorParameter('templateToRender', DI\get('page.notfound')),
     'ErrorController' => DI\object(Sarcofag\Theme\Controller\SimpleRendererController::class)
         ->constructorParameter('templateToRender', DI\get('page.error')),
