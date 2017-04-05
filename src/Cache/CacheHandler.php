@@ -85,6 +85,10 @@ class CacheHandler
     {
         $items = $this->cacheStorage->getItem(self::ROUTE_CACHE_KEY);
 
+        if (!is_array($items)) {
+            return [];
+        }
+
         // This filter will prevent the situation when
         // you publish one post few times. So it is will
         // remove from cache post with same ID and we will

@@ -215,6 +215,9 @@ class App implements ActionInterface
      */
     protected function routeDispatcher()
     {
+//        define('TIMER_BEGIN_ROUTE_DISPATCHER', microtime());
+//        define('DIFF_BEGIN_ROUTE_DISPATCHER', microtime() - TIMER_BEGIN_WP_EXECUTION);
+
         $container = $this->app->getContainer();
         $wpService = $this->wpService;
         foreach ($this->getAllEntriesToBuildRoutes() as $routePostEntity) {
@@ -223,18 +226,30 @@ class App implements ActionInterface
             // queue to be registered as a routes.
             if (!$this->routePostEntityFilter->filter($routePostEntity)) continue;
 
-            $this->app->map(['get', 'post'], $routePostEntity->getUrl(), 
+            $this->app->map(['get', 'post'], $routePostEntity->getUrl(),
                             function ($request, $response, $args)
                                 use ($container, $routePostEntity, $wpService) {
+
+                // Setup requested entity as the
+                // current post and put it to the
+                // global scope, because it is common for WP
+                global $post;
+                $post = $wpService->get_post($routePostEntity->getId());
+                $wpService->setup_postdata($post);
+
                 $invokableController = $container->get($routePostEntity->getController());
                 return $invokableController($request, $response,
                                             array_merge($args,
-                                                        ['requestedEntity'=>
-                                                             $wpService
-                                                                 ->get_post($routePostEntity->getId())]));
+                                                        ['requestedEntity'=> $post]));
             });
         }
+
+//        define('TIMER_BEFORE_APP_RUN', microtime());
+//        define('DIFF_BEFORE_APP_RUN', microtime() - TIMER_BEGIN_ROUTE_DISPATCHER);
         $this->app->run();
+
+//        define('TIMER_AFTER_APP_RUN', microtime());
+//        define('DIFF_AFTER_APP_RUN', microtime() - TIMER_BEFORE_APP_RUN);
     }
     
     
