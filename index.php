@@ -24,7 +24,8 @@ $containerBuilder->addDefinitions(['DefaultCacheStorage' => $cacheStorage]);
 if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
     $definitions = $cacheStorage->getItem('diDefinitions');
 } else {
-    $definitions = [new \DI\Definition\Source\DefinitionFile(__DIR__ . '/config/di.inc.php')];
+    $definitions = [];
+    $definitions[] = new \DI\Definition\Source\DefinitionFile(__DIR__ . '/config/di.inc.php');
 
     $activePlugins = get_option('active_plugins');
     foreach ($activePlugins as $activePlugin) {
@@ -35,10 +36,15 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
         $definitions[] = new \DI\Definition\Source\DefinitionFile($pluginDiConfig);
     }
 
-    if (file_exists(get_template_directory() . '/src/config/di.inc.php')) {
-        $definitions[] =
-            new \DI\Definition\Source\DefinitionFile(get_template_directory() .
-                                                        '/src/config/di.inc.php');
+    $iterator = new RegexIterator(new IteratorIterator(
+                                        new DirectoryIterator(get_template_directory() . '/src/config')),
+                                  '/^di\..*inc\.php$/i',
+                                  RegexIterator::MATCH);
+
+    /* @var $iteratorItem \DirectoryIterator */
+    foreach ($iterator as $iteratorItem) {
+        $definitions[] = new \DI\Definition\Source\DefinitionFile($iteratorItem->getRealPath());
+
     }
 
     if (!is_null($cacheStorage)) {
@@ -47,6 +53,7 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
 }
 
 array_map([$containerBuilder, 'addDefinitions'], $definitions);
+
 $di = $containerBuilder->build();
 
 foreach ($di->get('autoloader.paths') as $namespace => $autoloaderPaths) {
