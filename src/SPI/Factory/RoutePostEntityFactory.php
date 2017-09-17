@@ -63,7 +63,7 @@ class RoutePostEntityFactory implements RoutePostEntityFactoryInterface
      * state to hydrate inside RoutePostEntityInterface
      * implementation and return to further usage.
      *
-     * @param string $data Array with initial raw data.
+     * @param array $data Array with initial raw data.
      * @return RoutePostEntityInterface
      */
     public function create($data)

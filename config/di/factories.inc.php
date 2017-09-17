@@ -24,5 +24,9 @@ return [
                                                                $container,
                                                                $container->get('Sarcofag\API\WP'));
         return $renderer;
+    },
+
+    'SarcofagApp' => function  (\Interop\Container\ContainerInterface $container) {
+        return $container->get(Sarcofag\App::class);
     }
 ];

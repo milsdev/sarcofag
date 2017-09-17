@@ -4,7 +4,7 @@ use Interop\Container\ContainerInterface;
 return [
     'EventManager' =>
                 DI\object(\Sarcofag\SPI\EventManager\EventManager::class)
-                   ->method('attachListeners', DI\get(\Sarcofag\App::class))
+                   ->method('attachListeners', DI\get('SarcofagApp'))
 
                    ->method('attachListeners', DI\get('MenuRegistry'))
                    ->method('attachListeners', DI\get('WidgetRegistry'))
