@@ -1,0 +1,9 @@
+<p>
+    <label for="<?=$fieldName?>"><?=$name?></label>
+    <br />
+        <?php $value = get_post_meta( $object->ID, $name, true ) ?>
+    <input name="<?=$fieldName?>" id="<?=$fieldName?>" style="width: 97%;" value="<?=$value?>" />
+    <input type="hidden" name="<?=$fieldName?>-nonce"
+           value="<?php echo wp_create_nonce( plugin_basename( $file ) ); ?>" />
+
+</p>

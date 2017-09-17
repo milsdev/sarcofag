@@ -14,4 +14,6 @@ return [
                   // Custom fields listeners
                    ->method('attachListeners',
                                 DI\get(\Sarcofag\Admin\CustomFields\ControllerPageMappingField::class))
+                   ->method('attachListeners',
+                                DI\get(\Sarcofag\Admin\CustomFields\CustomRoutePageMappingField::class))
 ];

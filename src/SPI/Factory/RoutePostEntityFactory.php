@@ -1,6 +1,7 @@
 <?php
 namespace Sarcofag\SPI\Factory;
 
+use Sarcofag\Admin\CustomFields\CustomRoutePageMappingField;
 use Sarcofag\API\WP;
 use Sarcofag\Entity\RoutePostEntity;
 use Sarcofag\Entity\RoutePostEntityInterface;
@@ -24,6 +25,11 @@ class RoutePostEntityFactory implements RoutePostEntityFactoryInterface
     protected $controllerPageMappingField;
 
     /**
+     * @var CustomRoutePageMappingField
+     */
+    protected $customRoutePageMappingField;
+
+    /**
      * @var array
      */
     protected $postTypeSettings;
@@ -37,14 +43,17 @@ class RoutePostEntityFactory implements RoutePostEntityFactoryInterface
      * RoutePostEntityFactory constructor.
      *
      * @param ControllerPageMappingField $controllerPageMappingField
+     * @param CustomRoutePageMappingField $customRoutePageMappingField
      * @param WP $wpService
      * @param array $postTypeSettings
      */
     public function __construct(ControllerPageMappingField $controllerPageMappingField,
+                                CustomRoutePageMappingField $customRoutePageMappingField,
                                 WP $wpService,
                                 array $postTypeSettings)
     {
         $this->controllerPageMappingField = $controllerPageMappingField;
+        $this->customRoutePageMappingField = $customRoutePageMappingField;
         $this->wpService = $wpService;
         $this->postTypeSettings = $postTypeSettings;
     }
@@ -65,6 +74,12 @@ class RoutePostEntityFactory implements RoutePostEntityFactoryInterface
         $controller = $this->controllerPageMappingField
                            ->getValue($data['ID']);
 
+        // Fetching custom route to handle defined
+        // post, controller defined inside the post
+        // edit form in the field CustomRoute.
+        $customRoute = $this->customRoutePageMappingField
+                            ->getValue($data['ID']);
+
         // Fetching default controller to be able to use
         // if no one controller were mentioned
         // while POST were created
@@ -73,7 +88,11 @@ class RoutePostEntityFactory implements RoutePostEntityFactoryInterface
             $controller = $this->postTypeSettings[$data['post_type']]['defaultController'];
         }
 
-        $url = parse_url($this->wpService->get_permalink($data['ID']), PHP_URL_PATH);
+        if (empty($customRoute)) {
+            $url = parse_url($this->wpService->get_permalink($data['ID']), PHP_URL_PATH);
+        } else {
+            $url = $customRoute;
+        }
 
         return new RoutePostEntity($data['ID'], $controller, $url);
     }

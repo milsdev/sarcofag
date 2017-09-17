@@ -25,22 +25,6 @@ abstract class CustomFieldAbstract
      * @return array
      */
     abstract protected function showColumnsHead($defaults);
-
-    /**
-     * @return void
-     */
-    abstract protected function createSelectBox();
-
-    /**
-     * Save the value of the field
-     * to the concrete object identifier.
-     *
-     * @param number $post_id
-     * @param \WP_Post $post
-     *
-     * @return mixed
-     */
-    abstract protected function saveSelectBoxValue($post_id, \WP_Post $post);
 }
 
 
