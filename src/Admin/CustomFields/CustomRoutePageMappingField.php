@@ -1,10 +1,9 @@
 <?php
 namespace Sarcofag\Admin\CustomFields;
-use DI\FactoryInterface;
+
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
 use Sarcofag\SPI\EventManager\DataFilter\DataFilterInterface;
 use Sarcofag\SPI\EventManager\ListenerInterface;
-use Sarcofag\View\Renderer\RendererInterface;
 
 /**
  * Class CustomRoutePageMappingField
@@ -29,36 +28,13 @@ class CustomRoutePageMappingField extends CustomFieldAbstract implements ActionI
     protected $name = 'Custom Route';
 
     /**
-     * @var RendererInterface
-     */
-    protected $viewRenderer = null;
-
-    /**
-     * @var FactoryInterface
-     */
-    protected $factory;
-
-    /**
-     * ControllerPageMappingField constructor.
-     *
-     * @param RendererInterface $viewRenderer
-     * @param FactoryInterface $factory
-     */
-    public function __construct(RendererInterface $viewRenderer, FactoryInterface $factory)
-    {
-        $this->viewRenderer = $viewRenderer;
-        $this->factory = $factory;
-    }
-
-    /**
      * @return ListenerInterface[]
      */
     public function getActionListeners()
     {
         return [
             $this->factory->make('ActionListener',
-                                   ['names' => ['manage_page_posts_custom_column',
-                                                'manage_post_posts_custom_column' ],
+                                   ['names' => $this->getNameOfHooksForColumnsContentToHandle(),
                                     'callable' => function ($column_name, $postId) {
                                             return $this->showColumnsContent($column_name, $postId);
                                     },
@@ -85,8 +61,7 @@ class CustomRoutePageMappingField extends CustomFieldAbstract implements ActionI
     {
         return [
             $this->factory->make('DataFilterListener',
-                                    ['names' => ['manage_page_posts_columns',
-                                                 'manage_post_posts_columns'],
+                                    ['names' => $this->getNameOfHooksForColumnsHeadToHandle(),
                                      'callable' => function ($defaults) { return $this->showColumnsHead($defaults);},
                                      'priority' => 10]),
         ];
@@ -151,8 +126,10 @@ class CustomRoutePageMappingField extends CustomFieldAbstract implements ActionI
                                               'fieldName'=>$this->fieldName]);
         }, $this);
 
-        add_meta_box( $this->fieldName.'-text', $this->name, $render, 'page', 'normal', 'high' );
-        add_meta_box( $this->fieldName.'-text', $this->name, $render, 'post', 'normal', 'high' );
+
+        foreach ($this->postTypes as $postType) {
+            add_meta_box( $this->fieldName.'-text', $this->name, $render, $postType, 'normal', 'high' );
+        }
     }
 
     /**

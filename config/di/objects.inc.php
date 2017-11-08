@@ -47,5 +47,11 @@ return [
         ->constructorParameter('templateToRender', DI\get('page.notallowed')),
 
     \Sarcofag\SPI\Factory\RoutePostEntityFactory::class =>
-        DI\object()->constructorParameter('postTypeSettings', DI\get('postTypes'))
+        DI\object()->constructorParameter('postTypeSettings', DI\get('postTypes')),
+
+    \Sarcofag\Admin\CustomFields\ControllerPageMappingField::class =>
+        DI\object()->constructorParameter('postTypeSettings', DI\get('postTypes')),
+
+    \Sarcofag\Admin\CustomFields\CustomRoutePageMappingField::class =>
+        DI\object()->constructorParameter('postTypeSettings', DI\get('postTypes')),
 ];
