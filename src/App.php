@@ -114,7 +114,7 @@ class App implements ActionInterface
     {
         $listeners = [
             $this->factory->make('ActionListener', [
-                'names' => 'template_include',
+                'names' => 'after_setup_theme',
                 'callable' => function () {
                     return $this->routeDispatcher();
                 },
@@ -176,7 +176,7 @@ class App implements ActionInterface
         }
 
         $items = [];
-        
+
         $postTypeSettings = $this->app->getContainer()->get('postTypes');
 
         foreach ($postTypeSettings as $postType=>$postTypeOptions) {
@@ -248,6 +248,6 @@ class App implements ActionInterface
 //        define('TIMER_AFTER_APP_RUN', microtime());
 //        define('DIFF_AFTER_APP_RUN', microtime() - TIMER_BEFORE_APP_RUN);
     }
-    
-    
+
+
 }
