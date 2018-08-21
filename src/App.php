@@ -114,7 +114,7 @@ class App implements ActionInterface
     {
         $listeners = [
             $this->factory->make('ActionListener', [
-                'names' => 'after_setup_theme',
+                'names' => 'template_include',
                 'callable' => function () {
                     return $this->routeDispatcher();
                 },
