@@ -7,7 +7,7 @@ Version: 0.0-alpha
 Author: Mil's
 Author URI: http://milsdev.com/
 */
-
+define('TIMER_INIT_SARCOFAG', microtime(true));
 $loader = include ABSPATH . '/vendor/autoload.php';
 
 $loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
@@ -54,7 +54,9 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
 
 array_map([$containerBuilder, 'addDefinitions'], $definitions);
 
+define('TIMER_SARCOFAG_BUILD', microtime(true));
 $di = $containerBuilder->build();
+define('TIMER_DIFF_SARCOFAG_BUILD', microtime(true) - TIMER_SARCOFAG_BUILD);
 
 foreach ($di->get('autoloader.paths') as $namespace => $autoloaderPaths) {
     if (is_array($autoloaderPaths)) {
@@ -67,3 +69,4 @@ foreach ($di->get('autoloader.paths') as $namespace => $autoloaderPaths) {
 }
 
 $di->get('EventManager');
+define('TIMER_DIFF_INIT_SARCOFAG', microtime(true) - TIMER_INIT_SARCOFAG);

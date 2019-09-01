@@ -212,9 +212,6 @@ class App implements ActionInterface
      */
     protected function routeDispatcher()
     {
-//        define('TIMER_BEGIN_ROUTE_DISPATCHER', microtime());
-//        define('DIFF_BEGIN_ROUTE_DISPATCHER', microtime() - TIMER_BEGIN_WP_EXECUTION);
-
         $container = $this->app->getContainer();
         $wpService = $this->wpService;
         foreach ($this->getAllEntriesToBuildRoutes() as $routePostEntity) {
@@ -241,12 +238,7 @@ class App implements ActionInterface
             });
         }
 
-//        define('TIMER_BEFORE_APP_RUN', microtime());
-//        define('DIFF_BEFORE_APP_RUN', microtime() - TIMER_BEGIN_ROUTE_DISPATCHER);
         $this->app->run();
-
-//        define('TIMER_AFTER_APP_RUN', microtime());
-//        define('DIFF_AFTER_APP_RUN', microtime() - TIMER_BEFORE_APP_RUN);
     }
 
 
