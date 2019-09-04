@@ -7,24 +7,25 @@ Version: 0.0-alpha
 Author: Mil's
 Author URI: http://milsdev.com/
 */
+define('TIMER_DIFF_INIT_WP', microtime(true) - TIMER_RUN);
+
 define('TIMER_INIT_SARCOFAG', microtime(true));
 $loader = include ABSPATH . '/vendor/autoload.php';
 
 $loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
-
-$containerBuilder = new DI\ContainerBuilder();
 
 $cacheStorage = null;
 if (defined("SARCOFAG_CACHE_PARAMS")) {
     $cacheStorage = \Zend\Cache\StorageFactory::factory(SARCOFAG_CACHE_PARAMS);
 }
 
-$containerBuilder->addDefinitions(['DefaultCacheStorage' => $cacheStorage]);
-
-if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
-    $definitions = $cacheStorage->getItem('diDefinitions');
+if (!is_null($cacheStorage) && $cacheStorage->hasItem('diContainer')) {
+    $di = $cacheStorage->getItem('diContainer');
 } else {
-    $definitions = [];
+    $containerBuilder = new DI\ContainerBuilder();
+    $containerBuilder->addDefinitions(['DefaultCacheStorage' => $cacheStorage]);
+
+    $definitions   = [];
     $definitions[] = new \DI\Definition\Source\DefinitionFile(__DIR__ . '/config/di.inc.php');
 
     $activePlugins = get_option('active_plugins');
@@ -37,9 +38,9 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
     }
 
     $iterator = new RegexIterator(new IteratorIterator(
-                                        new DirectoryIterator(get_template_directory() . '/src/config')),
-                                  '/^di\..*inc\.php$/i',
-                                  RegexIterator::MATCH);
+        new DirectoryIterator(get_template_directory() . '/src/config')),
+        '/^di\..*inc\.php$/i',
+        RegexIterator::MATCH);
 
     /* @var $iteratorItem \DirectoryIterator */
     foreach ($iterator as $iteratorItem) {
@@ -47,16 +48,16 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diDefinitions')) {
 
     }
 
+    array_map([$containerBuilder, 'addDefinitions'], $definitions);
+
+    define('TIMER_SARCOFAG_BUILD', microtime(true));
+    $di = $containerBuilder->build();
+    define('TIMER_DIFF_SARCOFAG_BUILD', microtime(true) - TIMER_SARCOFAG_BUILD);
+
     if (!is_null($cacheStorage)) {
-        $cacheStorage->setItem('diDefinitions', $definitions);
+        $cacheStorage->setItem('diContainer', $di);
     }
 }
-
-array_map([$containerBuilder, 'addDefinitions'], $definitions);
-
-define('TIMER_SARCOFAG_BUILD', microtime(true));
-$di = $containerBuilder->build();
-define('TIMER_DIFF_SARCOFAG_BUILD', microtime(true) - TIMER_SARCOFAG_BUILD);
 
 foreach ($di->get('autoloader.paths') as $namespace => $autoloaderPaths) {
     if (is_array($autoloaderPaths)) {
@@ -67,6 +68,10 @@ foreach ($di->get('autoloader.paths') as $namespace => $autoloaderPaths) {
 
     $loader->setPsr4($namespace, $autoloaderPaths);
 }
-
-$di->get('EventManager');
 define('TIMER_DIFF_INIT_SARCOFAG', microtime(true) - TIMER_INIT_SARCOFAG);
+
+define('TIMER_INIT_EVENT_MANAGER', microtime(true));
+$di->get('EventManager');
+define('TIMER_DIFF_INIT_EVENT_MANAGER', microtime(true) - TIMER_INIT_EVENT_MANAGER);
+
+define('TIMER_SARCOFAG_INITIALIZED', microtime(true));
