@@ -7,7 +7,9 @@ Version: 0.0-alpha
 Author: Mil's
 Author URI: http://milsdev.com/
 */
-define('TIMER_DIFF_INIT_WP', microtime(true) - TIMER_RUN);
+if (defined('TIMER_RUN')) {
+    define('TIMER_DIFF_INIT_WP', microtime(true) - TIMER_RUN);
+}
 
 define('TIMER_INIT_SARCOFAG', microtime(true));
 $loader = include ABSPATH . '/vendor/autoload.php';
