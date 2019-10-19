@@ -13,6 +13,8 @@ return [
     'RoutePostEntityFactory' => DI\object(\Sarcofag\SPI\Factory\RoutePostEntityFactory::class),
     'RoutePostEntityFilter' => DI\get(\Sarcofag\SPI\Routing\RoutePostFilterAggregate::class),
 
+    Sarcofag\API\WP::class => DI\object(Api\WP::class),
+
     Slim\App::class => DI\object()->constructor(DI\get(DI\Container::class)),
     Sarcofag\App::class => DI\object()->constructorParameter('settings', DI\get('settings'))
                                       ->constructorParameter('routePostEntityFactory',
