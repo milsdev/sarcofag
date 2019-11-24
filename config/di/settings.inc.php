@@ -11,6 +11,8 @@ return [
     'page.notallowed' => 'theme/script/notallowed.phtml',
     'page.error' => 'theme/script/error.phtml',
     'autoloader.paths' => [],
+    'icl.default.language.code' => 'uk',
+    'icl.active.languages' => ['uk', 'ru'],
     'settings' => [
         'outputBuffering'=>'append',
         'httpVersion' => '1.1',

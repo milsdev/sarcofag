@@ -106,6 +106,9 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diContainer')) {
 define('TIMER_DIFF_INIT_SARCOFAG', microtime(true) - TIMER_INIT_SARCOFAG);
 
 define('TIMER_INIT_EVENT_MANAGER', microtime(true));
+
+define('ICL_DEFAULT_LANGUAGE_CODE', $di->get('icl.default.language.code'));
+
 $di->get('EventManager');
 define('TIMER_DIFF_INIT_EVENT_MANAGER', microtime(true) - TIMER_INIT_EVENT_MANAGER);
 
