@@ -5,7 +5,7 @@ use DI;
 use Sarcofag\Cache\CacheHandler;
 use Slim;
 use Sarcofag\API\WP;
-use Zend\Cache\Storage\StorageInterface;
+use Laminas\Cache\Storage\StorageInterface;
 use Sarcofag\Entity\RoutePostEntityInterface;
 use Sarcofag\SPI\EventManager\ListenerInterface;
 use Sarcofag\SPI\Factory\RoutePostEntityFactory;

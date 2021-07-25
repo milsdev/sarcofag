@@ -1,11 +1,13 @@
 <?php
 namespace SarcofagTest\Service\SPI\EventManager;
 
+use DI\Container;
 use Sarcofag\Exception\RuntimeException;
 use Sarcofag\API\WP;
 use Sarcofag\SPI\EventManager\Action\ActionInterface;
 use Sarcofag\SPI\EventManager\DataFilter\DataFilterInterface;
 use Sarcofag\SPI\EventManager\EventManager;
+use Sarcofag\SPI\EventManager\ListenerFactory;
 use Sarcofag\SPI\EventManager\ListenerInterface;
 
 class EventManagerTest extends \PHPUnit_Framework_TestCase
@@ -29,9 +31,12 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase
     protected function getListeners(array $names)
     {
         $event = $this->getMockBuilder(ListenerInterface::class)->getMock();
+
         $event->expects($this->once())->method('getNames')->willReturn($names);
         $event->expects($this->exactly(count($names)))->method('getPriority')
                 ->willReturn(96);
+        $event->expects($this->exactly(count($names)))->method('getCallable')
+                ->willReturn($event);
         $event->expects($this->exactly(count($names)))->method('getArgc')
                 ->willReturn(2);
         return $event;
@@ -53,6 +58,16 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase
                        ->method('getActionListeners')
                        ->willReturn([$listenersFirst, $listenersSecond]);
 
+        $listenerFactory = $this->getMockBuilder(ListenerFactory::class)
+                                ->disableOriginalConstructor()
+                                ->getMock();
+
+        $listenerFactory->expects($this->exactly(2))
+                        ->method('makeListener')
+                        ->willReturnArgument(1);
+
+        $container = $this->getMockBuilder(Container::class)->disableOriginalConstructor()->getMock();
+
         $this->wpStub
              ->expects($this->exactly(4))
              ->method('__call')
@@ -61,7 +76,12 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase
                                [$this->equalTo('add_action'), $this->equalTo(['t1', $listenersSecond, 96, 2])],
                                [$this->equalTo('add_action'), $this->equalTo(['t2', $listenersSecond, 96, 2])]);
 
-        $eventManager = new EventManager($this->wpStub);
+        $eventManager = new EventManager(
+            $this->wpStub,
+            $container,
+            $listenerFactory
+        );
+
         $eventManager->attachListeners($actionListener);
     }
 
@@ -81,6 +101,16 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase
                        ->method('getDataFilterListeners')
                        ->willReturn([$listenersFirst, $listenersSecond]);
 
+        $listenerFactory = $this->getMockBuilder(ListenerFactory::class)
+                                ->disableOriginalConstructor()
+                                ->getMock();
+
+        $listenerFactory->expects($this->exactly(2))
+                        ->method('makeListener')
+                        ->willReturnArgument(1);
+
+        $container = $this->getMockBuilder(Container::class)->disableOriginalConstructor()->getMock();
+
         $this->wpStub
              ->expects($this->exactly(4))
              ->method('__call')
@@ -89,7 +119,11 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase
                                [$this->equalTo('add_filter'), $this->equalTo(['t1', $listenersSecond, 96, 2])],
                                [$this->equalTo('add_filter'), $this->equalTo(['t2', $listenersSecond, 96, 2])]);
 
-        $eventManager = new EventManager($this->wpStub);
+        $eventManager = new EventManager(
+            $this->wpStub,
+            $container,
+            $listenerFactory
+        );
         $eventManager->attachListeners($actionListener);
     }
 
@@ -98,7 +132,17 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testExceptionInAttachListeners()
     {
-        $eventManager = new EventManager($this->wpStub);
+        $listenerFactory = $this->getMockBuilder(ListenerFactory::class)
+                                ->disableOriginalConstructor()
+                                ->getMock();
+
+        $listenerFactory->expects($this->exactly(0))
+                        ->method('makeListener')
+                        ->willReturnArgument(1);
+
+        $container = $this->getMockBuilder(Container::class)->disableOriginalConstructor()->getMock();
+
+        $eventManager = new EventManager($this->wpStub, $container, $listenerFactory);
         $eventManager->attachListeners(function (){});
     }
 }

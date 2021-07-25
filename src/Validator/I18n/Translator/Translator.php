@@ -1,8 +1,8 @@
 <?php
 namespace Sarcofag\Validator\I18n\Translator;
 
-use Zend\I18n\Translator\TranslatorInterface as I18nTranslatorInterface;
-use Zend\Validator\Translator\TranslatorInterface as ValidatorTranslatorInterface;
+use Laminas\I18n\Translator\TranslatorInterface as I18nTranslatorInterface;
+use Laminas\Validator\Translator\TranslatorInterface as ValidatorTranslatorInterface;
 
 class Translator implements I18nTranslatorInterface, ValidatorTranslatorInterface
 {

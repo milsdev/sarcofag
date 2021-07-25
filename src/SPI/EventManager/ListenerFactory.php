@@ -36,7 +36,6 @@ class ListenerFactory
                         ('Unsupported type of the event [' . $type . '], now supports only filter or action types');
         }
 
-        $listenerHandler = '';
         if (is_array($listener) && $type == WP::EVENT_TYPE_ACTION) {
             if (array_key_exists('ajax', $listener) && $listener['ajax'] === true) {
                 if (array_key_exists('callable', $listener) &&
@@ -45,7 +44,7 @@ class ListenerFactory
                                                 ->make(GenericAjaxHandler::class,
                                                         ['callable' => $listener['callable']]);
                 }
-                
+
                 $listener = $this->factory->make('AjaxActionListener', $listener);
             } else {
                 $listener = $this->factory->make('ActionListener', $listener);

@@ -5,7 +5,7 @@ namespace Sarcofag\Cache;
 use Sarcofag\API\WP;
 use Sarcofag\Entity\RoutePostEntityInterface;
 use Sarcofag\SPI\Factory\RoutePostEntityFactoryInterface;
-use Zend\Cache\Storage\StorageInterface;
+use Laminas\Cache\Storage\StorageInterface;
 
 class CacheHandler
 {
@@ -108,6 +108,11 @@ class CacheHandler
     protected function replaceRouteByIdInCache($routeId, \WP_Post $post)
     {
         $routesWithoutPublished = $this->getCacheItemsWithoutGivenRoute($routeId);
+
+        echo "<pre>";
+        print_r($post);
+        echo "</pre>";
+        exit(0);
 
         array_push($routesWithoutPublished, $this->routePostEntityFactory->create($post->to_array()));
         $this->cacheStorage->replaceItem(self::ROUTE_CACHE_KEY, $routesWithoutPublished);
