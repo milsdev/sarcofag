@@ -3,7 +3,7 @@
 Plugin Name: Sarcofag
 Plugin URI: http://milsdev.com/#portfolio
 Description: OOP wrapper for the WordPress
-Version: 0.0-alpha
+Version: 2.0.2
 Author: Mil's
 Author URI: http://milsdev.com/
 */
@@ -48,15 +48,12 @@ if (defined("SARCOFAG_CACHE_PARAMS")) {
     $cacheStorage = \Laminas\Cache\StorageFactory::factory(SARCOFAG_CACHE_PARAMS);
 }
 
-if (!is_null($cacheStorage) && $cacheStorage->hasItem('diContainer')) {
+if (!is_null($cacheStorage) && $cacheStorage->hasItem('diContainerBuilder')) {
     __registerAutoloaderPaths($loader, get_template_directory() . '/src/config/autoloader.inc.php');
 
-    $di = $cacheStorage->getItem('diContainer');
-
-    __registerAutoloaderPaths($loader, $di->get('autoloader.paths'));
+    $containerBuilder = $cacheStorage->getItem('diContainerBuilder');
 } else {
     $containerBuilder = new DI\ContainerBuilder();
-    $containerBuilder->addDefinitions(['DefaultCacheStorage' => $cacheStorage]);
 
     $definitions   = [];
     $definitions[] = new \DI\Definition\Source\DefinitionFile(__DIR__ . '/config/di.inc.php');
@@ -91,16 +88,17 @@ if (!is_null($cacheStorage) && $cacheStorage->hasItem('diContainer')) {
 
     array_map([$containerBuilder, 'addDefinitions'], $definitions);
 
-    define('TIMER_SARCOFAG_BUILD', microtime(true));
-    $di = $containerBuilder->build();
-    define('TIMER_DIFF_SARCOFAG_BUILD', microtime(true) - TIMER_SARCOFAG_BUILD);
-
     if (!is_null($cacheStorage)) {
-        $cacheStorage->setItem('diContainer', $di);
+        $cacheStorage->setItem('diContainerBuilder', $containerBuilder);
     }
-
-    __registerAutoloaderPaths($loader, $di->get('autoloader.paths'));
 }
+
+define('TIMER_SARCOFAG_BUILD', microtime(true));
+$containerBuilder->addDefinitions(['DefaultCacheStorage' => $cacheStorage]);
+$di = $containerBuilder->build();
+define('TIMER_DIFF_SARCOFAG_BUILD', microtime(true) - TIMER_SARCOFAG_BUILD);
+
+__registerAutoloaderPaths($loader, $di->get('autoloader.paths'));
 
 
 define('TIMER_DIFF_INIT_SARCOFAG', microtime(true) - TIMER_INIT_SARCOFAG);
