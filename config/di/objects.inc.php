@@ -25,9 +25,9 @@ return [
         DI\object()->constructorParameter('routePostEntityFactory', DI\get('RoutePostEntityFactory'))
                    ->constructorParameter('storage', DI\get('DefaultCacheStorage')),
 
-    'ValidatorChain' => DI\object(\Zend\Validator\ValidatorChain::class)
+    'ValidatorChain' => DI\object(\Laminas\Validator\ValidatorChain::class)
                            ->method('setPluginManager',
-                                    DI\object(\Zend\Validator\ValidatorPluginManager::class)
+                                    DI\object(\Laminas\Validator\ValidatorPluginManager::class)
                                         ->constructor(DI\get(DI\Container::class),
                                                       DI\get('zend.servicemanager.settings')))
                            ->scope(\DI\Scope::PROTOTYPE),

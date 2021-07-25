@@ -45,7 +45,7 @@ $loader->setPsr4('Sarcofag\\', [ __DIR__ . '/src' ]);
 
 $cacheStorage = null;
 if (defined("SARCOFAG_CACHE_PARAMS")) {
-    $cacheStorage = \Zend\Cache\StorageFactory::factory(SARCOFAG_CACHE_PARAMS);
+    $cacheStorage = \Laminas\Cache\StorageFactory::factory(SARCOFAG_CACHE_PARAMS);
 }
 
 if (!is_null($cacheStorage) && $cacheStorage->hasItem('diContainer')) {
